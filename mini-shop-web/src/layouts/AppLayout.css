@@ -1,0 +1,113 @@
+.app-layout {
+  --app-topbar-height: 128px;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  padding-top: var(--app-topbar-height);
+  box-sizing: border-box;
+  overflow-x: clip;
+
+  background:
+    radial-gradient(circle at 8% 18%, rgb(196 181 253 / 22%), transparent 24%),
+    radial-gradient(circle at 92% 38%, rgb(254 215 170 / 18%), transparent 23%),
+    radial-gradient(
+      circle at 50% 100%,
+      rgb(221 214 254 / 18%),
+      transparent 30%
+    ),
+    #f8fafc;
+}
+
+.app-layout__topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  width: 100%;
+
+  background: rgb(255 255 255 / 78%);
+  border-bottom: 1px solid rgb(226 232 240 / 75%);
+  box-shadow: 0 8px 30px rgb(15 23 42 / 6%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.app-layout__main {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: clamp(18px, 3vw, 32px) clamp(10px, 2.5vw, 20px);
+  box-sizing: border-box;
+}
+
+.app-layout__container {
+  width: 100%;
+  max-width: 1200px;
+  min-width: 0;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.app-layout__container > * {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .app-layout__main {
+    padding: 16px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-layout__main {
+    padding: 12px 8px;
+  }
+}
+
+.app-layout__desktop-topbar {
+  display: block;
+}
+
+@media (max-width: 820px) {
+  .app-layout {
+    background: #f5f5f5;
+  }
+
+  .app-layout__desktop-topbar {
+    display: none;
+  }
+
+  .app-layout__main {
+    padding: 0 0 calc(72px + env(safe-area-inset-bottom));
+  }
+
+  .app-layout__container {
+    max-width: none;
+  }
+
+  .app-layout__desktop-footer {
+    display: none;
+  }
+}
+
+@media (max-width: 820px) {
+  .chat-hub__launcher {
+    display: none;
+  }
+
+  .chat-hub__menu {
+    top: 70px;
+    right: 10px;
+    bottom: auto;
+
+    width: min(260px, calc(100vw - 20px));
+
+    z-index: 3000;
+  }
+}

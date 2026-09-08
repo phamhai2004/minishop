@@ -1,0 +1,362 @@
+.mobile-topbar {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  .mobile-topbar {
+    position: relative;
+    z-index: 2500;
+
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 66px;
+
+    padding: max(10px, env(safe-area-inset-top)) 14px 10px;
+
+    gap: 10px;
+
+    box-sizing: border-box;
+
+    border-bottom: 1px solid rgb(255 255 255 / 10%);
+
+    background:
+      radial-gradient(
+        circle at 92% 10%,
+        rgb(251 146 60 / 18%),
+        transparent 28%
+      ),
+      radial-gradient(
+        circle at 12% 110%,
+        rgb(196 181 253 / 18%),
+        transparent 32%
+      ),
+      linear-gradient(
+        115deg,
+        #3b0764 0%,
+        #4c1d95 32%,
+        #6d28d9 68%,
+        #7c3aed 100%
+      );
+
+    color: #ffffff;
+
+    box-shadow:
+      0 8px 24px rgb(59 7 100 / 18%),
+      inset 0 -1px 0 rgb(255 255 255 / 5%);
+  }
+
+  .mobile-topbar__search {
+    flex: 1 1 auto;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 0;
+
+    background: transparent;
+  }
+
+  .mobile-topbar__search > * {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .mobile-topbar__icon-button {
+    display: grid;
+    place-items: center;
+
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    padding: 0;
+
+    box-sizing: border-box;
+
+    border: 1px solid rgb(216 180 254 / 30%);
+    border-radius: 13px;
+
+    background: linear-gradient(
+      145deg,
+      rgb(192 132 252 / 28%),
+      rgb(126 34 206 / 26%)
+    );
+
+    color: #ffffff;
+
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 12%),
+      0 5px 14px rgb(46 16 101 / 14%);
+
+    font: inherit;
+
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+      transform 0.18s ease,
+      border-color 0.18s ease,
+      background 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  .mobile-topbar__icon-button svg {
+    display: block;
+
+    max-width: 27px;
+    max-height: 27px;
+
+    flex-shrink: 0;
+  }
+
+  .mobile-topbar__icon-button:active {
+    transform: scale(0.94);
+
+    border-color: rgb(233 213 255 / 55%);
+
+    background: linear-gradient(
+      145deg,
+      rgb(192 132 252 / 48%),
+      rgb(147 51 234 / 40%)
+    );
+
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 16%),
+      0 3px 10px rgb(46 16 101 / 16%);
+  }
+
+  .mobile-topbar__icon-button:focus-visible {
+    outline: 3px solid rgb(216 180 254 / 34%);
+    outline-offset: 2px;
+  }
+
+  .mobile-topbar--management {
+    justify-content: space-between;
+  }
+
+  .mobile-topbar__brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 40px;
+
+    flex: 0 0 auto;
+
+    padding: 7px 11px;
+
+    border: 1px solid rgb(216 180 254 / 30%);
+    border-radius: 11px;
+
+    background: linear-gradient(
+      145deg,
+      rgb(192 132 252 / 27%),
+      rgb(126 34 206 / 25%)
+    );
+
+    color: #ffffff;
+
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 12%),
+      0 5px 14px rgb(46 16 101 / 12%);
+
+    font: inherit;
+
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+
+    letter-spacing: 0.1em;
+
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+      transform 0.18s ease,
+      border-color 0.18s ease,
+      background 0.18s ease;
+  }
+
+  .mobile-topbar__brand:active {
+    transform: scale(0.96);
+
+    border-color: rgb(233 213 255 / 50%);
+
+    background: linear-gradient(
+      145deg,
+      rgb(192 132 252 / 45%),
+      rgb(147 51 234 / 38%)
+    );
+  }
+
+  .mobile-topbar__brand:focus-visible {
+    outline: 3px solid rgb(216 180 254 / 34%);
+    outline-offset: 2px;
+  }
+
+  .mobile-topbar__management-title {
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+    margin: 0;
+
+    overflow: hidden;
+
+    color: #ffffff;
+
+    font-size: clamp(0.82rem, 3.4vw, 0.95rem);
+    font-weight: 700;
+    line-height: 1.35;
+
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 820px) and (hover: hover) {
+  .mobile-topbar__icon-button:hover {
+    transform: translateY(-1px);
+
+    border-color: rgb(233 213 255 / 48%);
+
+    background: linear-gradient(
+      145deg,
+      rgb(192 132 252 / 42%),
+      rgb(147 51 234 / 34%)
+    );
+
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 16%),
+      0 7px 17px rgb(46 16 101 / 18%);
+  }
+
+  .mobile-topbar__brand:hover {
+    transform: translateY(-1px);
+
+    border-color: rgb(233 213 255 / 48%);
+
+    background: linear-gradient(
+      145deg,
+      rgb(192 132 252 / 40%),
+      rgb(147 51 234 / 34%)
+    );
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-topbar {
+    min-height: 62px;
+
+    padding: max(9px, env(safe-area-inset-top)) 10px 9px;
+
+    gap: 8px;
+  }
+
+  .mobile-topbar__icon-button {
+    width: 39px;
+    height: 39px;
+
+    flex-basis: 39px;
+
+    border-radius: 12px;
+  }
+
+  .mobile-topbar__icon-button svg {
+    max-width: 25px;
+    max-height: 25px;
+  }
+
+  .mobile-topbar__brand {
+    min-height: 38px;
+
+    padding-inline: 9px;
+
+    font-size: 0.93rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .mobile-topbar {
+    padding-left: 8px;
+    padding-right: 8px;
+
+    gap: 6px;
+  }
+
+  .mobile-topbar__icon-button {
+    width: 37px;
+    height: 37px;
+
+    flex-basis: 37px;
+
+    border-radius: 11px;
+  }
+
+  .mobile-topbar__icon-button svg {
+    max-width: 23px;
+    max-height: 23px;
+  }
+
+  .mobile-topbar__brand {
+    min-height: 36px;
+
+    padding: 6px 8px;
+
+    font-size: 0.88rem;
+
+    letter-spacing: 0.08em;
+  }
+
+  .mobile-topbar__management-title {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .mobile-topbar {
+    padding-inline: 7px;
+
+    gap: 5px;
+  }
+
+  .mobile-topbar__icon-button {
+    width: 35px;
+    height: 35px;
+
+    flex-basis: 35px;
+  }
+
+  .mobile-topbar__icon-button svg {
+    max-width: 22px;
+    max-height: 22px;
+  }
+
+  .mobile-topbar__brand {
+    padding-inline: 7px;
+
+    font-size: 0.82rem;
+  }
+
+  .mobile-topbar__management-title {
+    font-size: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-topbar *,
+  .mobile-topbar *::before,
+  .mobile-topbar *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác minh email</title>
+</head>
+
+<body>
+
+<h2>Chào bạn!</h2>
+
+<p>
+    Cảm ơn bạn đã đăng ký tài khoản tại Hair.
+</p>
+
+<p>
+    Vui lòng nhấn vào nút bên dưới để xác minh địa chỉ email:
+</p>
+
+<p>
+    <a th:href="${verificationUrl}">
+        Xác minh email
+    </a>
+</p>
+
+<p>
+    Link xác minh có hiệu lực đến:
+    <strong th:text="${expiresAt}"></strong>
+</p>
+
+<p>
+    Nếu bạn không thực hiện đăng ký tài khoản,
+    hãy bỏ qua email này.
+</p>
+
+</body>
+</html>

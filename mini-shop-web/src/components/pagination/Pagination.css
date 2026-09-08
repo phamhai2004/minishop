@@ -1,0 +1,254 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  width: 100%;
+  min-width: 0;
+
+  margin-top: 18px;
+
+  gap: 9px;
+
+  box-sizing: border-box;
+}
+
+.pagination__pages {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+  max-width: 100%;
+
+  gap: 6px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  flex-wrap: nowrap;
+
+  padding: 2px;
+
+  box-sizing: border-box;
+
+  scrollbar-width: thin;
+  scrollbar-color: #c4b5fd transparent;
+}
+
+.pagination__pages::-webkit-scrollbar {
+  height: 4px;
+}
+
+.pagination__pages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pagination__pages::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+
+  background: #c4b5fd;
+}
+
+.pagination__button,
+.pagination__page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  min-height: 41px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #ffffff, #fafafa);
+
+  color: #475569;
+
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 3px 10px rgb(15 23 42 / 3%);
+
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.pagination__button {
+  padding: 8px 15px;
+
+  white-space: nowrap;
+}
+
+.pagination__page {
+  min-width: 41px;
+
+  padding: 8px 10px;
+}
+
+.pagination__button:hover:not(:disabled),
+.pagination__page:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  border-color: #c4b5fd;
+
+  background: linear-gradient(135deg, #faf5ff, #f5f3ff);
+
+  color: #7e22ce;
+
+  box-shadow: 0 6px 14px rgb(109 40 217 / 7%);
+}
+
+.pagination__page--active {
+  border-color: transparent;
+
+  background: linear-gradient(135deg, #a855f7 0%, #9333ea 45%, #7e22ce 100%);
+
+  color: #ffffff;
+
+  box-shadow: 0 7px 17px rgb(147 51 234 / 20%);
+}
+
+.pagination__page--active:hover:not(:disabled) {
+  border-color: transparent;
+
+  background: linear-gradient(135deg, #c084fc, #a855f7 45%, #8b5cf6);
+
+  color: #ffffff;
+
+  box-shadow: 0 9px 20px rgb(147 51 234 / 24%);
+}
+
+.pagination__button:disabled {
+  border-color: #e2e8f0;
+
+  background: #f8fafc;
+
+  color: #94a3b8;
+
+  opacity: 0.75;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+
+  transform: none;
+}
+
+.pagination__button:active:not(:disabled),
+.pagination__page:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+}
+
+.pagination__button:focus-visible,
+.pagination__page:focus-visible {
+  outline: 3px solid rgb(168 85 247 / 20%);
+  outline-offset: 2px;
+}
+
+@media (max-width: 820px) {
+  .pagination {
+    margin-top: 15px;
+
+    gap: 8px;
+  }
+
+  .pagination__button,
+  .pagination__page {
+    min-height: 40px;
+  }
+
+  .pagination__page {
+    min-width: 40px;
+  }
+}
+
+@media (max-width: 520px) {
+  .pagination {
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-top: 13px;
+  }
+
+  .pagination__pages {
+    justify-content: flex-start;
+
+    width: 100%;
+
+    padding-bottom: 4px;
+  }
+
+  .pagination__button {
+    width: 100%;
+
+    min-height: 44px;
+
+    padding: 8px 12px;
+  }
+
+  .pagination__page {
+    min-width: 38px;
+    min-height: 38px;
+
+    padding: 7px 9px;
+
+    font-size: 0.74rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .pagination__pages {
+    gap: 5px;
+  }
+
+  .pagination__page {
+    min-width: 36px;
+    min-height: 36px;
+
+    padding: 6px 8px;
+
+    border-radius: 9px;
+
+    font-size: 0.7rem;
+  }
+
+  .pagination__button {
+    min-height: 42px;
+
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .pagination__pages {
+    padding-inline: 1px;
+  }
+
+  .pagination__page {
+    min-width: 34px;
+    min-height: 34px;
+
+    padding: 5px 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagination__button,
+  .pagination__page {
+    transition-duration: 0.01ms !important;
+  }
+}

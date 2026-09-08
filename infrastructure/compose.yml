@@ -1,0 +1,167 @@
+name: mini-shop
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: minishop-mysql
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    ports:
+      - "${MYSQL_PORT}:3306"
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+    networks:
+      - minishop-network
+
+  redis:
+    image: redis:7-alpine
+
+    container_name: minishop-redis
+
+    restart: unless-stopped
+
+    command: redis-server --appendonly yes
+
+    ports:
+      - "${REDIS_PORT}:6379"
+
+    volumes:
+      - redis-data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+    networks:
+      - minishop-network
+
+  qdrant:
+    image: qdrant/qdrant:v1.15.4
+
+    container_name: minishop-qdrant
+
+    restart: unless-stopped
+
+    ports:
+      - "${QDRANT_PORT}:6333"
+
+    volumes:
+      - qdrant-data:/qdrant/storage
+
+    networks:
+      - minishop-network
+  api:
+    build:
+      context: ../mini-shop-api
+
+    image: mini-shop-api
+
+    container_name: minishop-api
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+      JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Ho_Chi_Minh
+
+    ports:
+      - "${SPRING_PORT}:8080"
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+      redis:
+        condition: service_healthy
+
+      ai:
+        condition: service_healthy
+
+    networks:
+      - minishop-network
+
+  ai:
+    build:
+      context: ../mini-shop-ai
+
+    image: mini-shop-ai
+
+    container_name: minishop-ai
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    ports:
+      - "${FASTAPI_PORT}:8000"
+
+    volumes:
+      - ai-hf-cache:/root/.cache/huggingface
+
+    environment:
+      HF_HOME: /root/.cache/huggingface
+
+    depends_on:
+      qdrant:
+        condition: service_started
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health')",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+    networks:
+      - minishop-network
+networks:
+  minishop-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    external: true
+    name: ${MYSQL_VOLUME}
+
+  redis-data:
+    external: true
+    name: ${REDIS_VOLUME}
+
+  qdrant-data:
+    external: true
+    name: ${QDRANT_VOLUME}
+
+  ai-hf-cache:

@@ -1,0 +1,589 @@
+.shop-registration-page {
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+
+  margin: 0;
+
+  padding: clamp(26px, 4vw, 42px)
+    max(clamp(14px, 3vw, 24px), calc((100% - 980px) / 2)) clamp(52px, 6vw, 72px);
+
+  box-sizing: border-box;
+
+  background:
+    radial-gradient(circle at 7% 5%, rgb(196 181 253 / 22%), transparent 24%),
+    radial-gradient(circle at 94% 14%, rgb(254 215 170 / 16%), transparent 22%),
+    #f8fafc;
+
+  color: #334155;
+}
+
+.shop-registration-page *,
+.shop-registration-page *::before,
+.shop-registration-page *::after {
+  box-sizing: border-box;
+}
+
+.shop-registration-page__heading {
+  margin-bottom: 24px;
+}
+
+.shop-registration-page__heading h1 {
+  position: relative;
+
+  width: fit-content;
+  max-width: 100%;
+
+  margin: 0 0 10px;
+
+  padding-bottom: 11px;
+
+  color: #0f172a;
+
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+
+  overflow-wrap: anywhere;
+}
+
+.shop-registration-page__heading h1::after {
+  content: "";
+
+  position: absolute;
+
+  bottom: 0;
+  left: 0;
+
+  width: 52px;
+  height: 3px;
+
+  border-radius: 999px;
+
+  background: linear-gradient(90deg, #a855f7, #7e22ce, #fb923c);
+}
+
+.shop-registration-page__heading p {
+  max-width: 720px;
+
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.shop-registration-page__state {
+  padding: 46px 20px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgb(196 181 253 / 10%), transparent 34%),
+    #fff;
+
+  color: #64748b;
+
+  font-size: 0.78rem;
+
+  text-align: center;
+
+  box-shadow: 0 8px 20px rgb(15 23 42 / 4%);
+}
+
+.shop-registration-page__alert {
+  margin-bottom: 18px;
+
+  padding: 11px 13px;
+
+  border-radius: 10px;
+
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.shop-registration-page__alert--error {
+  border: 1px solid #fecaca;
+
+  background: #fef2f2;
+
+  color: #b91c1c;
+}
+
+.shop-registration-page__alert--success {
+  border: 1px solid #bbf7d0;
+
+  background: #f0fdf4;
+
+  color: #15803d;
+}
+
+.shop-registration-form {
+  padding: 22px;
+
+  border: 1px solid rgb(226 232 240 / 94%);
+  border-radius: 17px;
+
+  background:
+    radial-gradient(circle at 100% 0%, rgb(196 181 253 / 8%), transparent 28%),
+    #fff;
+
+  box-shadow:
+    0 9px 23px rgb(15 23 42 / 4%),
+    0 3px 10px rgb(109 40 217 / 3%);
+}
+
+.shop-registration-form__grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  min-width: 0;
+
+  gap: 17px;
+}
+
+.shop-registration-form label {
+  display: grid;
+
+  min-width: 0;
+
+  gap: 7px;
+}
+
+.shop-registration-form label span {
+  color: #475569;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.shop-registration-form input,
+.shop-registration-form textarea {
+  width: 100%;
+  min-width: 0;
+
+  padding: 10px 12px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #fff;
+
+  color: #0f172a;
+
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1.45;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.shop-registration-form input::placeholder,
+.shop-registration-form textarea::placeholder {
+  color: #94a3b8;
+}
+
+.shop-registration-form input:hover,
+.shop-registration-form textarea:hover {
+  border-color: #a78bfa;
+}
+
+.shop-registration-form input:focus,
+.shop-registration-form textarea:focus {
+  border-color: #8b5cf6;
+
+  background: #fff;
+
+  box-shadow: 0 0 0 4px rgb(139 92 246 / 10%);
+}
+
+.shop-registration-form textarea {
+  min-height: 120px;
+
+  resize: vertical;
+}
+
+.shop-registration-form__full {
+  grid-column: 1 / -1;
+}
+
+.shop-registration-form__submit {
+  min-height: 43px;
+
+  margin-top: 20px;
+
+  padding: 8px 17px;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #a855f7 0%, #9333ea 45%, #7e22ce 100%);
+
+  color: #fff;
+
+  font: inherit;
+  font-size: 0.77rem;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 18px rgb(147 51 234 / 19%);
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.shop-registration-form__submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  background: linear-gradient(135deg, #c084fc, #a855f7 45%, #8b5cf6);
+
+  box-shadow: 0 11px 22px rgb(147 51 234 / 23%);
+}
+
+.shop-registration-form__submit:disabled {
+  background: #e2e8f0;
+
+  color: #94a3b8;
+
+  opacity: 1;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+}
+
+.shop-registration-status {
+  position: relative;
+
+  margin-bottom: 18px;
+
+  padding: 22px;
+
+  overflow: hidden;
+
+  border: 1px solid rgb(226 232 240 / 94%);
+  border-radius: 17px;
+
+  background:
+    radial-gradient(circle at 100% 0%, rgb(196 181 253 / 8%), transparent 28%),
+    #fff;
+
+  box-shadow: 0 9px 23px rgb(15 23 42 / 4%);
+}
+
+.shop-registration-status::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 4px;
+}
+
+.shop-registration-status--pending::before {
+  background: #f59e0b;
+}
+
+.shop-registration-status--rejected::before {
+  background: #ef4444;
+}
+
+.shop-registration-status--active::before {
+  background: #22c55e;
+}
+
+.shop-registration-status--suspended::before {
+  background: #94a3b8;
+}
+
+.shop-registration-status h2 {
+  margin: 13px 0 7px;
+
+  color: #1e293b;
+
+  font-size: 1.12rem;
+  font-weight: 800;
+
+  overflow-wrap: anywhere;
+}
+
+.shop-registration-status > p {
+  margin: 0 0 18px;
+
+  color: #64748b;
+
+  font-size: 0.77rem;
+  line-height: 1.6;
+}
+
+.shop-registration-status__badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 5px 9px;
+
+  border: 1px solid transparent;
+  border-radius: 999px;
+
+  font-size: 0.66rem;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.shop-registration-status--pending .shop-registration-status__badge {
+  border-color: #fde68a;
+
+  background: #fffbeb;
+
+  color: #b45309;
+}
+
+.shop-registration-status--rejected .shop-registration-status__badge {
+  border-color: #fecaca;
+
+  background: #fef2f2;
+
+  color: #b91c1c;
+}
+
+.shop-registration-status--active .shop-registration-status__badge {
+  border-color: #bbf7d0;
+
+  background: #f0fdf4;
+
+  color: #15803d;
+}
+
+.shop-registration-status--suspended .shop-registration-status__badge {
+  border-color: #e2e8f0;
+
+  background: #f8fafc;
+
+  color: #64748b;
+}
+
+.shop-registration-status__reason {
+  margin-bottom: 18px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+
+  background: #fef2f2;
+}
+
+.shop-registration-status__reason strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #991b1b;
+
+  font-size: 0.73rem;
+}
+
+.shop-registration-status__reason p {
+  margin: 0;
+
+  color: #b91c1c;
+
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.shop-registration-status__notice {
+  margin-bottom: 18px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #ddd6fe;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #faf5ff, #f5f3ff);
+
+  color: #6d28d9;
+
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.shop-registration-info {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  min-width: 0;
+
+  gap: 10px;
+
+  margin: 0;
+}
+
+.shop-registration-info div {
+  min-width: 0;
+
+  padding: 12px;
+
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #f8fafc, #fff);
+}
+
+.shop-registration-info dt {
+  margin-bottom: 5px;
+
+  color: #64748b;
+
+  font-size: 0.67rem;
+}
+
+.shop-registration-info dd {
+  margin: 0;
+
+  color: #334155;
+
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
+}
+
+.shop-registration-page__resubmit {
+  margin-top: 18px;
+
+  padding: 18px;
+
+  border: 1px solid #ddd6fe;
+  border-radius: 14px;
+
+  background: linear-gradient(135deg, #fff, #faf5ff);
+
+  box-shadow: 0 6px 16px rgb(109 40 217 / 4%);
+}
+
+.shop-registration-page__resubmit p {
+  margin: 0 0 12px;
+
+  color: #64748b;
+
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+.shop-registration-page__resubmit button {
+  min-height: 42px;
+
+  padding: 8px 16px;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #a855f7, #9333ea 45%, #7e22ce);
+
+  color: #fff;
+
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 7px 16px rgb(147 51 234 / 17%);
+}
+
+.shop-registration-page__resubmit button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c084fc, #a855f7 45%, #8b5cf6);
+}
+
+.shop-registration-page__resubmit button:disabled {
+  background: #e2e8f0;
+
+  color: #94a3b8;
+
+  opacity: 1;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+}
+
+@media (max-width: 820px) {
+  .shop-registration-page {
+    padding: 22px 14px calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .shop-registration-form__grid,
+  .shop-registration-info {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-registration-form__full {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .shop-registration-page {
+    padding: 18px 10px calc(92px + env(safe-area-inset-bottom));
+  }
+
+  .shop-registration-page__heading h1 {
+    font-size: 1.7rem;
+  }
+
+  .shop-registration-form,
+  .shop-registration-status {
+    padding: 16px 14px;
+
+    border-radius: 15px;
+  }
+
+  .shop-registration-form__submit,
+  .shop-registration-page__resubmit button {
+    width: 100%;
+  }
+
+  .shop-registration-page__resubmit {
+    padding: 15px 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .shop-registration-page {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+}
+
+.shop-registration-page button:focus-visible {
+  outline: 3px solid rgb(168 85 247 / 20%);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-registration-page *,
+  .shop-registration-page *::before,
+  .shop-registration-page *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

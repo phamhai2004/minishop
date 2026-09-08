@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+.venv/
+venv/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+
+# Environment
+.env
+
+# Uploads
+uploads/
+
+# Logs
+*.log
+
+# Documentation
+README.md

@@ -1,0 +1,18 @@
+package com.example.minishop.constant;
+
+public enum OutboxEventType {
+
+    ORDER_CREATED,
+    ORDER_CANCELLED,
+    ORDER_RECEIVED,
+
+    SHOP_ORDER_CONFIRMED,
+    SHOP_ORDER_PACKING,
+    SHOP_ORDER_SHIPPING,
+    SHOP_ORDER_DELIVERED,
+    SHOP_ORDER_CANCELLED,
+
+    PAYMENT_SUCCEEDED,
+    SHOP_APPROVED,
+    PAYMENT_PAID
+}

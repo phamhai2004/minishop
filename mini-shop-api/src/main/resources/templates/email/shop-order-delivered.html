@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Đơn hàng đã giao thành công</title>
+</head>
+
+<body style="
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #333333;
+">
+
+<table width="100%"
+       cellpadding="0"
+       cellspacing="0"
+       style="background: #f5f5f5; padding: 24px 0;">
+
+    <tr>
+        <td align="center">
+
+            <table width="680"
+                   cellpadding="0"
+                   cellspacing="0"
+                   style="
+                       width: 100%;
+                       max-width: 680px;
+                       background: #ffffff;
+                       border-collapse: collapse;
+                   ">
+
+                <!-- HEADER -->
+                <tr>
+                    <td style="
+                        padding: 28px;
+                        text-align: center;
+                        border-bottom: 1px solid #eeeeee;
+                    ">
+
+                        <div style="
+                            color: #ee4d2d;
+                            font-size: 32px;
+                            font-weight: 700;
+                        ">
+                            Hair
+                        </div>
+
+                    </td>
+                </tr>
+
+                <!-- INTRO -->
+                <tr>
+                    <td style="padding: 30px 36px 20px;">
+
+                        <p style="
+                            margin: 0 0 18px;
+                            font-size: 16px;
+                        ">
+                            Xin chào
+                            <strong th:text="${customerName}">
+                                Khách hàng
+                            </strong>,
+                        </p>
+
+                        <p style="
+                            margin: 0 0 14px;
+                            font-size: 16px;
+                            line-height: 1.6;
+                        ">
+                            Đơn hàng
+                            <strong
+                                    style="color: #ee4d2d;"
+                                    th:text="|#${orderCode}|">
+                                #1
+                            </strong>
+                            của bạn từ
+                            <strong th:text="${shopName}">
+                                Shop
+                            </strong>
+                            đã được giao thành công vào
+                            <strong th:text="${deliveredDate}">
+                                28/08/2026
+                            </strong>.
+                        </p>
+
+                        <p style="
+                            margin: 0;
+                            font-size: 15px;
+                            line-height: 1.6;
+                            color: #666666;
+                        ">
+                            Vui lòng kiểm tra sản phẩm và xác nhận
+                            đã nhận hàng trên Hair.
+                        </p>
+
+                    </td>
+                </tr>
+
+                <!-- BUTTON -->
+                <tr>
+                    <td align="center"
+                        style="padding: 10px 36px 30px;">
+
+                        <a th:href="${orderUrl}"
+                           style="
+                               display: inline-block;
+                               min-width: 180px;
+                               padding: 13px 24px;
+                               background: #ee4d2d;
+                               color: #ffffff;
+                               text-decoration: none;
+                               text-align: center;
+                               font-weight: 700;
+                               border-radius: 4px;
+                           ">
+                            Xem đơn hàng
+                        </a>
+
+                    </td>
+                </tr>
+
+                <!-- DIVIDER -->
+                <tr>
+                    <td style="padding: 0 36px;">
+                        <div style="
+                            border-top: 1px solid #dddddd;
+                        "></div>
+                    </td>
+                </tr>
+
+                <!-- ORDER INFO -->
+                <tr>
+                    <td style="padding: 26px 36px;">
+
+                        <h3 style="
+                            margin: 0 0 20px;
+                            font-size: 16px;
+                        ">
+                            THÔNG TIN ĐƠN HÀNG
+                        </h3>
+
+                        <table width="100%"
+                               cellpadding="5"
+                               cellspacing="0">
+
+                            <tr>
+                                <td style="
+                                    width: 42%;
+                                    color: #666666;
+                                ">
+                                    Mã đơn hàng:
+                                </td>
+
+                                <td>
+                                    <strong
+                                            style="color: #ee4d2d;"
+                                            th:text="'#' + ${orderCode}">
+                                        #1
+                                    </strong>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="color: #666666;">
+                                    Ngày đặt hàng:
+                                </td>
+
+                                <td th:text="${orderDate}">
+                                    27/08/2026 20:30
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="color: #666666;">
+                                    Ngày giao hàng:
+                                </td>
+
+                                <td th:text="${deliveredDate}">
+                                    28/08/2026 15:20
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="color: #666666;">
+                                    Người bán:
+                                </td>
+
+                                <td>
+                                    <strong th:text="${shopName}">
+                                        Shop
+                                    </strong>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="color: #666666;">
+                                    Phương thức thanh toán:
+                                </td>
+
+                                <td th:text="${paymentMethod}">
+                                    COD
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </td>
+                </tr>
+
+                <!-- PRODUCTS -->
+                <tr>
+                    <td style="padding: 0 36px 10px;">
+
+                        <div style="
+                            border-top: 1px solid #dddddd;
+                            margin-bottom: 26px;
+                        "></div>
+
+                        <h3 style="
+                            margin: 0 0 20px;
+                            font-size: 16px;
+                        ">
+                            SẢN PHẨM ĐÃ GIAO
+                        </h3>
+
+                        <table width="100%"
+                               cellpadding="0"
+                               cellspacing="0">
+
+                            <tr th:each="item : ${items}">
+
+                                <td style="
+                                    padding: 16px 0;
+                                    border-bottom: 1px solid #eeeeee;
+                                ">
+
+                                    <table width="100%"
+                                           cellpadding="0"
+                                           cellspacing="0">
+
+                                        <tr>
+
+                                            <!-- IMAGE -->
+                                            <td width="120"
+                                                valign="top"
+                                                style="
+                                                    padding-right: 18px;
+                                                ">
+
+                                                <img
+                                                        th:if="${item.imageUrl != null}"
+                                                        th:src="${item.imageUrl}"
+                                                        width="110"
+                                                        height="110"
+                                                        alt="Sản phẩm"
+                                                        style="
+                                                        width: 110px;
+                                                        height: 110px;
+                                                        object-fit: cover;
+                                                        border-radius: 4px;
+                                                        border: 1px solid #eeeeee;
+                                                    "
+                                                >
+
+                                                <div
+                                                        th:if="${item.imageUrl == null}"
+                                                        style="
+                                                        width: 110px;
+                                                        height: 110px;
+                                                        background: #f3f3f3;
+                                                        border: 1px solid #eeeeee;
+                                                        text-align: center;
+                                                        line-height: 110px;
+                                                        font-size: 12px;
+                                                        color: #999999;
+                                                    ">
+                                                    Không có ảnh
+                                                </div>
+
+                                            </td>
+
+                                            <!-- PRODUCT INFO -->
+                                            <td valign="top">
+
+                                                <div
+                                                        th:text="${item.productName}"
+                                                        style="
+                                                        font-size: 15px;
+                                                        line-height: 1.5;
+                                                        font-weight: 600;
+                                                        margin-bottom: 8px;
+                                                    ">
+                                                    Tên sản phẩm
+                                                </div>
+
+                                                <div
+                                                        th:if="${item.variantSummary != null}"
+                                                        style="
+                                                        color: #777777;
+                                                        font-size: 14px;
+                                                        margin-bottom: 5px;
+                                                    ">
+                                                    Phân loại:
+                                                    <span
+                                                            th:text="${item.variantSummary}">
+                                                        Đỏ - 37
+                                                    </span>
+                                                </div>
+
+                                                <div
+                                                        th:if="${item.sku != null}"
+                                                        style="
+                                                        color: #999999;
+                                                        font-size: 13px;
+                                                        margin-bottom: 5px;
+                                                    ">
+                                                    SKU:
+                                                    <span
+                                                            th:text="${item.sku}">
+                                                    </span>
+                                                </div>
+
+                                                <div style="
+                                                    color: #555555;
+                                                    font-size: 14px;
+                                                    margin-bottom: 5px;
+                                                ">
+                                                    Số lượng:
+                                                    <strong
+                                                            th:text="${item.quantity}">
+                                                        1
+                                                    </strong>
+                                                </div>
+
+                                                <div style="
+                                                    color: #ee4d2d;
+                                                    font-size: 15px;
+                                                    font-weight: 600;
+                                                "
+                                                     th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                                    5.000.000 ₫
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+
+                                    </table>
+
+                                </td>
+
+                            </tr>
+
+                        </table>
+
+                    </td>
+                </tr>
+
+                <!-- TOTAL -->
+                <tr>
+                    <td style="padding: 24px 36px;">
+
+                        <table width="100%"
+                               cellpadding="6"
+                               cellspacing="0">
+
+                            <tr>
+                                <td style="color: #666666;">
+                                    Tạm tính
+                                </td>
+
+                                <td align="right"
+                                    th:text="${#numbers.formatDecimal(totalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                    0 ₫
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="color: #666666;">
+                                    Giảm giá
+                                </td>
+
+                                <td align="right"
+                                    th:text="${#numbers.formatDecimal(discountAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                    0 ₫
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="color: #666666;">
+                                    Phí vận chuyển
+                                </td>
+
+                                <td align="right"
+                                    th:text="${#numbers.formatDecimal(shippingFee, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                    0 ₫
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="
+                                    padding-top: 12px;
+                                    font-size: 16px;
+                                ">
+                                    <strong>Tổng thanh toán</strong>
+                                </td>
+
+                                <td align="right"
+                                    style="
+                                        padding-top: 12px;
+                                        color: #ee4d2d;
+                                        font-size: 20px;
+                                        font-weight: 700;
+                                    "
+                                    th:text="${#numbers.formatDecimal(finalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                    0 ₫
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </td>
+                </tr>
+
+                <!-- ADDRESS -->
+                <tr>
+                    <td style="padding: 0 36px 30px;">
+
+                        <div style="
+                            background: #fafafa;
+                            border: 1px solid #eeeeee;
+                            padding: 18px;
+                        ">
+
+                            <strong>
+                                ĐỊA CHỈ GIAO HÀNG
+                            </strong>
+
+                            <p style="
+                                margin: 12px 0 5px;
+                            ">
+                                <span th:text="${receiverName}">
+                                    Nguyễn Văn A
+                                </span>
+
+                                -
+
+                                <span th:text="${receiverPhone}">
+                                    0900000000
+                                </span>
+                            </p>
+
+                            <p style="
+                                margin: 0;
+                                line-height: 1.6;
+                                color: #666666;
+                            "
+                               th:text="${shippingAddress}">
+                                Địa chỉ
+                            </p>
+
+                        </div>
+
+                    </td>
+                </tr>
+
+                <!-- THANKS -->
+                <tr>
+                    <td style="
+                        padding: 24px 36px;
+                        border-top: 1px solid #eeeeee;
+                    ">
+
+                        <p style="margin: 0 0 8px;">
+                            Trân trọng,
+                        </p>
+
+                        <strong>Đội ngũ Hair</strong>
+
+                    </td>
+                </tr>
+
+                <!-- FOOTER -->
+                <tr>
+                    <td style="
+                        padding: 22px 36px;
+                        background: #fafafa;
+                        color: #999999;
+                        font-size: 12px;
+                        text-align: center;
+                        line-height: 1.6;
+                    ">
+
+                        Đây là email tự động.
+                        Vui lòng không trả lời email này.
+
+                        <br>
+
+                        © 2026 Hair
+
+                    </td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+
+</table>
+
+</body>
+</html>
