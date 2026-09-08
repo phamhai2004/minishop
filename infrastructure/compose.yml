@@ -11,7 +11,7 @@ services:
       - .env
 
     ports:
-      - "${MYSQL_PORT}:3306"
+      - "${MYSQL_HOST_PORT}:3306"
 
     volumes:
       - mysql-data:/var/lib/mysql
@@ -44,7 +44,7 @@ services:
     command: redis-server --appendonly yes
 
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_HOST_PORT}:6379"
 
     volumes:
       - redis-data:/data
@@ -66,7 +66,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "${QDRANT_PORT}:6333"
+      - "${QDRANT_HOST_PORT}:6333"
 
     volumes:
       - qdrant-data:/qdrant/storage
@@ -91,7 +91,7 @@ services:
       JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Ho_Chi_Minh
 
     ports:
-      - "${SPRING_PORT}:8080"
+      - "${SPRING_HOST_PORT}:8080"
 
     depends_on:
       mysql:
@@ -102,6 +102,28 @@ services:
 
       ai:
         condition: service_healthy
+
+    networks:
+      - minishop-network
+
+  web:
+    build:
+      context: ../mini-shop-web
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        VITE_WS_URL: ${VITE_WS_URL}
+
+    image: mini-shop-web
+
+    container_name: minishop-web
+
+    restart: unless-stopped
+
+    ports:
+      - "${REACT_HOST_PORT}:80"
+
+    depends_on:
+      - api
 
     networks:
       - minishop-network
@@ -120,7 +142,7 @@ services:
       - .env
 
     ports:
-      - "${FASTAPI_PORT}:8000"
+      - "${FASTAPI_HOST_PORT}:8000"
 
     volumes:
       - ai-hf-cache:/root/.cache/huggingface
@@ -153,15 +175,13 @@ networks:
 
 volumes:
   mysql-data:
-    external: true
     name: ${MYSQL_VOLUME}
 
   redis-data:
-    external: true
     name: ${REDIS_VOLUME}
 
   qdrant-data:
-    external: true
     name: ${QDRANT_VOLUME}
 
   ai-hf-cache:
+    name: minishop-ai-hf-cache

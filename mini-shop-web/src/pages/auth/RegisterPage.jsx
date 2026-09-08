@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import authApi from "../../api/authApi";
+import { API_BASE_URL } from "../../api/httpClients";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 import "./RegisterPage.css";
@@ -158,12 +159,11 @@ function RegisterPage() {
   };
 
   const handleGoogleRegister = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    window.location.href = `${API_BASE_URL}/oauth2/authorization/google`;
   };
 
   const handleFacebookRegister = () => {
-    window.location.href =
-      "http://localhost:8080/oauth2/authorization/facebook";
+    window.location.href = `${API_BASE_URL}/oauth2/authorization/facebook`;
   };
 
   return (

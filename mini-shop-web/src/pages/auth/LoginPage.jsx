@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 import authApi from "../../api/authApi";
+import { API_BASE_URL } from "../../api/httpClients";
 import { useAuth } from "../../contexts/AuthContext";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 
@@ -163,12 +164,11 @@ function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    window.location.href = `${API_BASE_URL}/oauth2/authorization/google`;
   };
 
   const handleFacebookLogin = () => {
-    window.location.href =
-      "http://localhost:8080/oauth2/authorization/facebook";
+    window.location.href = `${API_BASE_URL}/oauth2/authorization/facebook`;
   };
 
   if (isAuthenticated) {
