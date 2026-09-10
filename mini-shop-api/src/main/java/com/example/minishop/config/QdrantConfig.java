@@ -10,14 +10,24 @@ public class QdrantConfig {
     @Bean
     public RestClient qdrantRestClient(QdrantProperties properties) {
 
-        return RestClient.builder()
+        String protocol = properties.isHttps() ? "https://" : "http://";
+
+        RestClient.Builder builder = RestClient.builder()
                 .baseUrl(
-                        "http://" +
+                        protocol +
                                 properties.getHost() +
                                 ":" +
                                 properties.getPort()
-                )
-                .build();
-    }
+                );
 
+        if (properties.getApiKey() != null
+                && !properties.getApiKey().isBlank()) {
+            builder.defaultHeader(
+                    "api-key",
+                    properties.getApiKey()
+            );
+        }
+
+        return builder.build();
+    }
 }

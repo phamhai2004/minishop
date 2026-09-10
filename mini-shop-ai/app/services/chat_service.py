@@ -74,6 +74,11 @@ QUY TẮC BẮT BUỘC:
 """
 
 
+AI_PROVIDER = os.getenv(
+    "AI_PROVIDER",
+    "ollama"
+).strip().lower()
+
 OLLAMA_BASE_URL = os.getenv(
     "OLLAMA_BASE_URL",
     "http://host.docker.internal:11434"
@@ -81,7 +86,22 @@ OLLAMA_BASE_URL = os.getenv(
 
 OLLAMA_MODEL = os.getenv(
     "OLLAMA_MODEL",
-    "qwen2.5:3b-instruct"
+    "qwen2.5:1.5b-instruct"
+)
+
+GROQ_API_KEY = os.getenv(
+    "GROQ_API_KEY",
+    ""
+)
+
+GROQ_MODEL = os.getenv(
+    "GROQ_MODEL",
+    "openai/gpt-oss-20b"
+)
+
+GROQ_BASE_URL = os.getenv(
+    "GROQ_BASE_URL",
+    "https://api.groq.com/openai/v1"
 )
 
 
@@ -324,7 +344,7 @@ Nếu PRODUCT_FOUND = true thì KHÔNG ĐƯỢC trả lời rằng Hair không c
 def chat(
     message: str,
     product_context: str,
-    intent: str 
+    intent: str
 ) -> str:
 
     prompt = build_prompt(
@@ -333,35 +353,73 @@ def chat(
         intent
     )
 
-    payload = {
-        "model": OLLAMA_MODEL,
-        "messages": [
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        "stream": False,
-        "keep_alive": "10m",
-        "options": {
-            "temperature": 0,
-            "num_ctx": 4096,
-            "num_predict": 180
+    messages = [
+        {
+            "role": "system",
+            "content": SYSTEM_PROMPT
+        },
+        {
+            "role": "user",
+            "content": prompt
         }
-    }
+    ]
 
-    response = httpx.post(
-        f"{OLLAMA_BASE_URL}/api/chat",
-        json=payload,
-        timeout=300.0
+    if AI_PROVIDER == "groq":
+
+        if not GROQ_API_KEY:
+            raise RuntimeError(
+                "GROQ_API_KEY is required when AI_PROVIDER=groq"
+            )
+
+        payload = {
+            "model": GROQ_MODEL,
+            "messages": messages,
+            "temperature": 0,
+            "max_tokens": 180
+        }
+
+        response = httpx.post(
+            f"{GROQ_BASE_URL}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json=payload,
+            timeout=300.0
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        return data["choices"][0]["message"]["content"]
+
+    if AI_PROVIDER == "ollama":
+
+        payload = {
+            "model": OLLAMA_MODEL,
+            "messages": messages,
+            "stream": False,
+            "keep_alive": "10m",
+            "options": {
+                "temperature": 0,
+                "num_ctx": 4096,
+                "num_predict": 180
+            }
+        }
+
+        response = httpx.post(
+            f"{OLLAMA_BASE_URL}/api/chat",
+            json=payload,
+            timeout=300.0
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        return data["message"]["content"]
+
+    raise RuntimeError(
+        f"Unsupported AI_PROVIDER: {AI_PROVIDER}"
     )
-
-    response.raise_for_status()
-
-    data = response.json()
-
-    return data["message"]["content"]

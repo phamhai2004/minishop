@@ -8,6 +8,8 @@ public class QdrantProperties {
     private String host;
     private int port;
     private String collection;
+    private String apiKey;
+    private boolean https;
 
     public String getHost() {
         return host;
@@ -31,5 +33,21 @@ public class QdrantProperties {
 
     public void setCollection(String collection) {
         this.collection = collection;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public boolean isHttps() {
+        return https;
+    }
+
+    public void setHttps(boolean https) {
+        this.https = https;
     }
 }

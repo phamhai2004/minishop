@@ -24,12 +24,15 @@ public class QdrantService {
     }
 
     private String baseUrl() {
-        return "http://" +
+        String protocol = properties.isHttps()
+                ? "https://"
+                : "http://";
+
+        return protocol +
                 properties.getHost() +
                 ":" +
                 properties.getPort();
     }
-
     private static final Logger log =
             LoggerFactory.getLogger(QdrantService.class);
 

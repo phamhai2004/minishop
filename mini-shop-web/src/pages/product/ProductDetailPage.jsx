@@ -11,6 +11,7 @@ import ProductInfo from "../../components/product/ProductInfo";
 import ReviewSection from "../../components/review/ReviewSection";
 import ShopSummaryCard from "../../components/shop/ShopSummaryCard";
 import WishlistButton from "../../components/wishlist/WishlistButton";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 import "./ProductDetailPage.css";
 
@@ -110,7 +111,7 @@ function ProductDetailPage() {
   if (loading) {
     return (
       <main>
-        <p>Loading product...</p>
+        <LoadingSpinner size="large" />
       </main>
     );
   }
