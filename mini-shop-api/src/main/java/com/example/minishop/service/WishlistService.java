@@ -115,17 +115,19 @@ public class WishlistService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponse> getTopFavoriteProductsForChat() {
+    public List<ProductResponse>
+    getTopFavoriteProductsForChat() {
 
-        return wishlistRepository
-                .findTopFavoriteProducts(
-                        ProductStatus.ACTIVE,
-                        ShopStatus.ACTIVE,
-                        PageRequest.of(0, 5)
-                )
-                .stream()
-                .map(productService::toProductResponse)
-                .toList();
+        List<Product> products =
+                wishlistRepository
+                        .findTopFavoriteProducts(
+                                ProductStatus.ACTIVE,
+                                ShopStatus.ACTIVE,
+                                PageRequest.of(0, 5)
+                        );
+
+        return productService
+                .toProductResponses(products);
     }
 
     @Transactional(readOnly = true)

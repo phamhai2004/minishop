@@ -20,6 +20,7 @@ import com.example.minishop.history.service.ProductViewHistoryService;
 import com.example.minishop.mapper.ProductMapper;
 import com.example.minishop.projection.ProductSummary;
 import com.example.minishop.qdrant.dto.SearchResult;
+import com.example.minishop.repository.FlashSaleRepository;
 import com.example.minishop.repository.ProductRepository;
 import com.example.minishop.security.SecurityUtils;
 import com.example.minishop.specification.ProductSpecification;
@@ -36,9 +37,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +54,7 @@ public class ProductService {
     private final AIClient aiClient;
     private final QdrantService qdrantService;
     private final ProductViewHistoryService productViewHistoryService;
+    private final FlashSaleRepository flashSaleRepository;
     public ProductService(
             ProductMapper productMapper,
             CategoryService categoryService,
@@ -59,17 +63,18 @@ public class ProductService {
             ShopService shopService,
             AIClient aiClient,
             QdrantService qdrantService,
-            ProductViewHistoryService productViewHistoryService
+            ProductViewHistoryService productViewHistoryService,
+            FlashSaleRepository flashSaleRepository
     ) {
         this.productMapper = productMapper;
         this.categoryService = categoryService;
         this.productRepository = productRepository;
         this.pricingService = pricingService;
         this.shopService = shopService;
-
         this.aiClient = aiClient;
         this.qdrantService = qdrantService;
         this.productViewHistoryService = productViewHistoryService;
+        this.flashSaleRepository = flashSaleRepository;
     }
 
     private Product getEntityById(Long id) {
@@ -143,9 +148,13 @@ public class ProductService {
                                     .orderByEffectiveQuantity(sortDirection == Sort.Direction.DESC)
                     );
 
-            return productRepository
-                    .findAll(specification, pageable)
-                    .map(this::toProductResponse);
+            Page<Product> productPage =
+                    productRepository.findAll(
+                            specification,
+                            pageable
+                    );
+
+            return mapProductsWithFlashSales(productPage);
         }
 
         Pageable pageable =
@@ -161,9 +170,13 @@ public class ProductService {
                                 .shopHasStatus(ShopStatus.ACTIVE)
                 );
 
-        return productRepository
-                .findAll(specification, pageable)
-                .map(this::toProductResponse);
+        Page<Product> productPage =
+                productRepository.findAll(
+                        specification,
+                        pageable
+                );
+
+        return mapProductsWithFlashSales(productPage);
     }
 
     @Transactional(readOnly = true)
@@ -265,21 +278,26 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<ProductResponse> searchByName(String keyword) {
-        if(keyword == null || keyword.trim().isEmpty()){
+        if (keyword == null || keyword.trim().isEmpty()) {
             throw new BadRequestException("Không được để trống");
         }
-        return productRepository.findByNameContainingIgnoreCase(keyword)
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
+
+        List<Product> products =
+                productRepository
+                        .findByNameContainingIgnoreCase(keyword);
+
+        return toProductResponses(products);
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByPriceGreaterThan(BigDecimal price) {
-        return productRepository.findByPriceGreaterThan(price)
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
+    public List<ProductResponse> getProductsByPriceGreaterThan(
+            BigDecimal price
+    ) {
+        List<Product> products =
+                productRepository
+                        .findByPriceGreaterThan(price);
+
+        return toProductResponses(products);
     }
 
     @Transactional(readOnly = true)
@@ -288,13 +306,16 @@ public class ProductService {
             BigDecimal max
     ) {
         if (min.compareTo(max) > 0) {
-            throw new BadRequestException("Giá min không được lớn hơn giá max");
+            throw new BadRequestException(
+                    "Giá min không được lớn hơn giá max"
+            );
         }
 
-        return productRepository.findByPriceBetween(min, max)
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
+        List<Product> products =
+                productRepository
+                        .findByPriceBetween(min, max);
+
+        return toProductResponses(products);
     }
 
     @Transactional(readOnly = true)
@@ -307,11 +328,11 @@ public class ProductService {
             );
         }
 
-        return productRepository
-                .findByEffectiveQuantityGreaterThan(quantity)
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
+        List<Product> products =
+                productRepository
+                        .findByEffectiveQuantityGreaterThan(quantity);
+
+        return toProductResponses(products);
     }
 
     @Transactional(readOnly = true)
@@ -321,26 +342,30 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByCategoryOrderByPriceDesc(Long categoryId) {
+    public List<ProductResponse>
+    getProductsByCategoryOrderByPriceDesc(
+            Long categoryId
+    ) {
         categoryService.getEntityById(categoryId);
 
-        return productRepository.findByCategory_IdOrderByPriceDesc(categoryId)
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
+        List<Product> products =
+                productRepository
+                        .findByCategory_IdOrderByPriceDesc(
+                                categoryId
+                        );
+
+        return toProductResponses(products);
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponse>
-    findProductsByCategoryName(
-            String name){
+    public List<ProductResponse> findProductsByCategoryName(
+            String name
+    ) {
+        List<Product> products =
+                productRepository
+                        .findProductsByCategoryName(name);
 
-        return productRepository
-                .findProductsByCategoryName(name)
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
-
+        return toProductResponses(products);
     }
 
     private Product getMyProductEntityById(Long productId) {
@@ -358,17 +383,24 @@ public class ProductService {
             int page,
             int size
     ) {
-        Shop shop = shopService.getCurrentSellerShop();
+        Shop shop =
+                shopService.getCurrentSellerShop();
 
-        Pageable pageable = PageRequest.of(
-                page,
-                size,
-                Sort.by("id").descending()
-        );
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by("id").descending()
+                );
 
-        return productRepository
-                .findByShop_Id(shop.getId(), pageable)
-                .map(this::toProductResponse);
+        Page<Product> productPage =
+                productRepository
+                        .findByShop_Id(
+                                shop.getId(),
+                                pageable
+                        );
+
+        return mapProductsWithFlashSales(productPage);
     }
 
     @Transactional(readOnly = true)
@@ -483,13 +515,13 @@ public class ProductService {
                             )
                     );
         }
-
-        return productRepository
-                .findAll(
+        Page<Product> productPage =
+                productRepository.findAll(
                         specification,
                         pageable
-                )
-                .map(this::toProductResponse);
+                );
+
+        return mapProductsWithFlashSales(productPage);
     }
 
     private void validateSearchRequest(
@@ -581,11 +613,13 @@ public class ProductService {
                                 p -> p
                         ));
 
-        return ids.stream()
-                .map(map::get)
-                .filter(Objects::nonNull)
-                .map(this::toProductResponse)
-                .toList();
+        List<Product> orderedProducts =
+                ids.stream()
+                        .map(map::get)
+                        .filter(Objects::nonNull)
+                        .toList();
+
+        return toProductResponses(orderedProducts);
     }
 
     @Transactional(readOnly = true)
@@ -630,28 +664,31 @@ public class ProductService {
                                 p -> p
                         ));
 
-        return ids.stream()
-                .map(map::get)
-                .filter(Objects::nonNull)
-                .map(this::toProductResponse)
-                .toList();
+        List<Product> orderedProducts =
+                ids.stream()
+                        .map(map::get)
+                        .filter(Objects::nonNull)
+                        .toList();
+
+        return toProductResponses(orderedProducts);
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByCategoryAndMaxPrice(
+    public List<ProductResponse>
+    getProductsByCategoryAndMaxPrice(
             String categoryName,
             BigDecimal maxPrice
     ) {
-        return productRepository
-                .findByCategory_NameIgnoreCaseAndPriceLessThanEqualAndStatusAndShop_Status(
-                        categoryName,
-                        maxPrice,
-                        ProductStatus.ACTIVE,
-                        ShopStatus.ACTIVE
-                )
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
+        List<Product> products =
+                productRepository
+                        .findByCategory_NameIgnoreCaseAndPriceLessThanEqualAndStatusAndShop_Status(
+                                categoryName,
+                                maxPrice,
+                                ProductStatus.ACTIVE,
+                                ShopStatus.ACTIVE
+                        );
+
+        return toProductResponses(products);
     }
 
     @Transactional(readOnly = true)
@@ -661,9 +698,11 @@ public class ProductService {
             BigDecimal minPrice,
             BigDecimal maxPrice
     ) {
-
         String normalizedKeyword =
-                keyword == null ? "" : keyword.trim();
+                keyword == null
+                        ? ""
+                        : keyword.trim();
+
         List<Product> products =
                 productRepository.searchProductsForChat(
                         normalizedKeyword,
@@ -675,21 +714,20 @@ public class ProductService {
                         PageRequest.of(0, 10)
                 );
 
-        return products.stream()
-                .map(this::toProductResponse)
-                .toList();
+        return toProductResponses(products);
     }
 
     @Transactional(readOnly = true)
     public List<ProductResponse> getActiveProductsForChat() {
 
-        return productRepository.findActiveProductsForChat(
-                        ProductStatus.ACTIVE,
-                        ShopStatus.ACTIVE
-                )
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
+        List<Product> products =
+                productRepository
+                        .findActiveProductsForChat(
+                                ProductStatus.ACTIVE,
+                                ShopStatus.ACTIVE
+                        );
+
+        return toProductResponses(products);
     }
 
     @Transactional(readOnly = true)
@@ -729,29 +767,139 @@ public class ProductService {
                         )
                 );
 
-        return productRepository
-                .findByCategory_IdAndStatusAndShop_Status(
-                        categoryId,
-                        ProductStatus.ACTIVE,
-                        ShopStatus.ACTIVE,
-                        pageable
-                )
-                .map(this::toProductResponse);
+        Page<Product> productPage =
+                productRepository
+                        .findByCategory_IdAndStatusAndShop_Status(
+                                categoryId,
+                                ProductStatus.ACTIVE,
+                                ShopStatus.ACTIVE,
+                                pageable
+                        );
+
+        return mapProductsWithFlashSales(productPage);
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponse> getTopSellingProductsForChat() {
+    public List<ProductResponse>
+    getTopSellingProductsForChat() {
 
-        return productRepository
-                .findTopSellingProducts(
-                        ProductStatus.ACTIVE,
-                        ShopStatus.ACTIVE,
-                        PaymentStatus.PAID,
-                        PageRequest.of(0, 5)
+        List<Product> products =
+                productRepository
+                        .findTopSellingProducts(
+                                ProductStatus.ACTIVE,
+                                ShopStatus.ACTIVE,
+                                PaymentStatus.PAID,
+                                PageRequest.of(0, 5)
+                        );
+
+        return toProductResponses(products);
+    }
+
+    private ProductResponse toProductResponse(
+            Product product,
+            FlashSale flashSale
+    ) {
+        Category category = product.getCategory();
+
+        ProductResponse response =
+                productMapper.toResponse(product, category);
+
+        if (flashSale != null) {
+            response.setFlashSale(true);
+            response.setSalePrice(flashSale.getSalePrice());
+            response.setFlashSaleQuantity(flashSale.getQuantity());
+            response.setFlashSaleSold(flashSale.getSold());
+            response.setRemain(
+                    flashSale.getQuantity() - flashSale.getSold()
+            );
+        } else {
+            response.setFlashSale(false);
+            response.setSalePrice(null);
+        }
+
+        if (product.getShop() != null) {
+            response.setShopId(product.getShop().getId());
+            response.setShopName(product.getShop().getName());
+        }
+
+        response.setStatus(product.getStatus());
+
+        if (product.getStatus() != null) {
+            response.setStatusName(
+                    product.getStatus().getDisplayName()
+            );
+        }
+
+        return response;
+    }
+
+    public List<ProductResponse> toProductResponses(
+            List<Product> products
+    ) {
+        if (products == null || products.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> productIds =
+                products.stream()
+                        .map(Product::getId)
+                        .toList();
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Map<Long, FlashSale> flashSaleMap =
+                flashSaleRepository
+                        .findActiveAvailableFlashSales(
+                                productIds,
+                                now
+                        )
+                        .stream()
+                        .collect(
+                                Collectors.toMap(
+                                        flashSale ->
+                                                flashSale.getProduct().getId(),
+                                        Function.identity(),
+                                        (existing, replacement) ->
+                                                existing
+                                )
+                        );
+
+        return products.stream()
+                .map(product ->
+                        toProductResponse(
+                                product,
+                                flashSaleMap.get(product.getId())
+                        )
                 )
-                .stream()
-                .map(this::toProductResponse)
                 .toList();
     }
 
+    private Page<ProductResponse> mapProductsWithFlashSales(
+            Page<Product> productPage
+    ) {
+        if (productPage.isEmpty()) {
+            return productPage.map(
+                    product -> toProductResponse(product, null)
+            );
+        }
+
+        List<ProductResponse> responses =
+                toProductResponses(
+                        productPage.getContent()
+                );
+
+        Map<Long, ProductResponse> responseMap =
+                responses.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        ProductResponse::getId,
+                                        Function.identity()
+                                )
+                        );
+
+        return productPage.map(
+                product ->
+                        responseMap.get(product.getId())
+        );
+    }
 }

@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface FlashSaleRepository
@@ -106,6 +107,21 @@ public interface FlashSaleRepository
             ShopStatus shopStatus,
 
             Pageable pageable
+    );
+
+    @Query("""
+    SELECT f
+    FROM FlashSale f
+    WHERE f.product.id IN :productIds
+      AND f.active = true
+      AND f.startTime <= :now
+      AND f.endTime >= :now
+      AND f.sold < f.quantity
+    ORDER BY f.product.id, f.startTime DESC
+""")
+    List<FlashSale> findActiveAvailableFlashSales(
+            @Param("productIds") List<Long> productIds,
+            @Param("now") LocalDateTime now
     );
 
 }

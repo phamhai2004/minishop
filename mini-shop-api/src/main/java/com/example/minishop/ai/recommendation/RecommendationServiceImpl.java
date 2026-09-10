@@ -198,10 +198,15 @@ public class RecommendationServiceImpl
                                 p -> p
                         ));
 
-        return recommendationIds.stream()
-                .map(map::get)
-                .filter(Objects::nonNull)
-                .map(productService::toProductResponse)
-                .toList();
+        List<Product> orderedProducts =
+                recommendationIds.stream()
+                        .map(map::get)
+                        .filter(Objects::nonNull)
+                        .toList();
+
+        return productService
+                .toProductResponses(
+                        orderedProducts
+                );
     }
 }
