@@ -15,7 +15,7 @@ public class WebSocketConfig
         implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketAuthChannelInterceptor authChannelInterceptor;
-    @Value("${frontend.url}")
+    @Value("${app.frontend-url}")
     private String frontendUrl;
 
     public WebSocketConfig(
