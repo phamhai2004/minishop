@@ -1,6 +1,7 @@
 package com.example.minishop.config;
 
 import com.example.minishop.security.WebSocketAuthChannelInterceptor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -13,8 +14,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig
         implements WebSocketMessageBrokerConfigurer {
 
-    private final WebSocketAuthChannelInterceptor
-            authChannelInterceptor;
+    private final WebSocketAuthChannelInterceptor authChannelInterceptor;
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     public WebSocketConfig(
             WebSocketAuthChannelInterceptor
@@ -48,7 +50,8 @@ public class WebSocketConfig
                 .addEndpoint("/ws")
                 .setAllowedOrigins(
                         "http://localhost:5173",
-                        "http://localhost:3000"
+                        "http://localhost:3000",
+                        frontendUrl
                 );
     }
 
