@@ -4,6 +4,7 @@ import com.example.minishop.config.QdrantProperties;
 import com.example.minishop.qdrant.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
@@ -17,8 +18,10 @@ public class QdrantService {
     private final RestClient restClient;
     private final QdrantProperties properties;
 
-    public QdrantService(RestClient restClient,
-                         QdrantProperties properties) {
+    public QdrantService(
+            @Qualifier("qdrantRestClient") RestClient restClient,
+            QdrantProperties properties
+    ) {
         this.restClient = restClient;
         this.properties = properties;
     }
