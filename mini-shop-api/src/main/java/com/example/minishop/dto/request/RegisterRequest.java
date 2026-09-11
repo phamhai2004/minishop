@@ -15,7 +15,7 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Mật khẩu không được bỏ trống")
-    @Size(min = 8, message = "Mật khẩu phải có ít nhất 8 ký tự")
+    @Size(min = 3, message = "Mật khẩu phải có ít nhất 3 ký tự")
     private String password;
     @Pattern(
             regexp = "^$|^[0-9]{9,11}$",
