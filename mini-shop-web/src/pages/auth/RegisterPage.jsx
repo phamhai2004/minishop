@@ -108,8 +108,8 @@ function RegisterPage() {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError("Mật khẩu phải có ít nhất 8 ký tự.");
+    if (formData.password.length < 3) {
+      setError("Mật khẩu phải có ít nhất 3 ký tự.");
       return;
     }
 

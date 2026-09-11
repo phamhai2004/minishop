@@ -79,61 +79,90 @@ public class RecommendationServiceImpl
             return List.of();
         }
 
-        List<List<Float>> embeddings = new ArrayList<>();
-        List<Float> weights = new ArrayList<>();
-
         Set<Long> viewedIds = new HashSet<>();
         Set<Long> purchasedIds = new HashSet<>();
 
+        List<Product> purchasedProducts =
+                purchaseHistoryService
+                        .getPurchasedProducts(userId);
+
+        List<Long> viewedProductIds =
+                history.stream()
+                        .map(view -> {
+                            Long productId =
+                                    view.getProduct().getId();
+
+                            viewedIds.add(productId);
+
+                            return productId;
+                        })
+                        .distinct()
+                        .toList();
+
+        List<Long> purchasedProductIds =
+                purchasedProducts.stream()
+                        .map(product -> {
+                            purchasedIds.add(product.getId());
+
+                            return product.getId();
+                        })
+                        .distinct()
+                        .toList();
+
+        LinkedHashSet<Long> allProductIds =
+                new LinkedHashSet<>();
+
+        allProductIds.addAll(viewedProductIds);
+        allProductIds.addAll(purchasedProductIds);
+
+        Map<Long, List<Float>> embeddingMap =
+                qdrantService.getEmbeddings(
+                        new ArrayList<>(allProductIds)
+                );
+
+        List<List<Float>> viewEmbeddings =
+                new ArrayList<>();
+
+        List<Float> weights =
+                new ArrayList<>();
+
         for (ProductViewHistory view : history) {
 
-            viewedIds.add(view.getProduct().getId());
+            Long productId =
+                    view.getProduct().getId();
 
             List<Float> embedding =
-                    qdrantService.getEmbedding(
-                            view.getProduct().getId()
-                    );
+                    embeddingMap.get(productId);
 
-            if (!embedding.isEmpty()) {
+            if (embedding != null
+                    && !embedding.isEmpty()) {
 
-                embeddings.add(embedding);
+                viewEmbeddings.add(embedding);
 
                 weights.add(
                         calculateWeight(
                                 view.getViewedAt()
                         )
                 );
-
             }
-
         }
 
-        if (embeddings.isEmpty()) {
+        if (viewEmbeddings.isEmpty()) {
             return List.of();
         }
 
         List<Float> viewEmbedding =
                 userEmbeddingService.weightedAverage(
-                        embeddings,
+                        viewEmbeddings,
                         weights
                 );
 
-        List<Product> purchasedProducts =
-                purchaseHistoryService.getPurchasedProducts(userId);
-
-        List<List<Float>> purchaseEmbeddings = new ArrayList<>();
-
-        for (Product product : purchasedProducts) {
-
-            purchasedIds.add(product.getId());
-
-            List<Float> embedding =
-                    qdrantService.getEmbedding(product.getId());
-
-            if (!embedding.isEmpty()) {
-                purchaseEmbeddings.add(embedding);
-            }
-        }
+        List<List<Float>> purchaseEmbeddings =
+                purchasedProductIds.stream()
+                        .map(embeddingMap::get)
+                        .filter(Objects::nonNull)
+                        .filter(embedding -> !embedding.isEmpty())
+                        .toList();
 
         List<Float> purchaseEmbedding =
                 userEmbeddingService.average(

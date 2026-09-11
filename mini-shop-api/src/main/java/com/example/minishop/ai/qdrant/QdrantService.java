@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -144,10 +145,17 @@ public class QdrantService {
         return response.getResult();
     }
 
-    public List<Float> getEmbedding(Long productId) {
+    public Map<Long, List<Float>> getEmbeddings(
+            List<Long> productIds
+    ) {
+
+        if (productIds == null || productIds.isEmpty()) {
+            return Map.of();
+        }
 
         GetPointRequest request = new GetPointRequest();
-        request.setIds(List.of(productId));
+
+        request.setIds(productIds);
         request.setWithVector(true);
 
         GetPointResponse response =
@@ -162,11 +170,38 @@ public class QdrantService {
                 || response.getResult() == null
                 || response.getResult().isEmpty()) {
 
-            return List.of();
+            return Map.of();
         }
 
-        return response.getResult()
-                .getFirst()
-                .getVector();
+        Map<Long, List<Float>> embeddings =
+                new HashMap<>();
+
+        for (GetPointResult result : response.getResult()) {
+
+            if (result.getId() != null
+                    && result.getVector() != null
+                    && !result.getVector().isEmpty()) {
+
+                embeddings.put(
+                        result.getId(),
+                        result.getVector()
+                );
+            }
+        }
+
+        return embeddings;
+    }
+
+    public List<Float> getEmbedding(Long productId) {
+
+        Map<Long, List<Float>> embeddings =
+                getEmbeddings(
+                        List.of(productId)
+                );
+
+        return embeddings.getOrDefault(
+                productId,
+                List.of()
+        );
     }
 }
