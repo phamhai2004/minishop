@@ -8,6 +8,8 @@ import com.example.minishop.mapper.CategoryMapper;
 import com.example.minishop.entity.Category;
 import com.example.minishop.repository.CategoryRepository;
 import com.example.minishop.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,10 +32,30 @@ public class CategoryService {
     }
 
     public List<CategoryResponse> getAll() {
-        return categoryRepository.findAll()
-                .stream()
-                .map(categoryMapper::toResponse)
-                .toList();
+
+        long start = System.currentTimeMillis();
+
+        List<Category> categories =
+                categoryRepository.findAll();
+
+        long repositoryEnd = System.currentTimeMillis();
+
+        List<CategoryResponse> responses =
+                categories.stream()
+                        .map(categoryMapper::toResponse)
+                        .toList();
+
+        long mappingEnd = System.currentTimeMillis();
+
+        log.info(
+                "CATEGORY_PERF repository={}ms mapping={}ms total={}ms size={}",
+                repositoryEnd - start,
+                mappingEnd - repositoryEnd,
+                mappingEnd - start,
+                categories.size()
+        );
+
+        return responses;
     }
 
     public CategoryResponse getById(Long id) {
@@ -89,4 +111,7 @@ public class CategoryService {
                         "Không tìm thấy danh mục với id: " + id
                 ));
     }
+
+    private static final Logger log =
+            LoggerFactory.getLogger(CategoryService.class);
 }
