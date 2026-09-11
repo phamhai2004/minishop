@@ -1,12 +1,11 @@
 package com.example.minishop.mapper;
 
 import com.example.minishop.dto.request.ProductRequest;
-import com.example.minishop.dto.response.ProductImageResponse;
-import com.example.minishop.dto.response.ProductResponse;
-import com.example.minishop.dto.response.ProductVariantOptionResponse;
-import com.example.minishop.dto.response.ProductVariantResponse;
+import com.example.minishop.dto.response.*;
 import com.example.minishop.entity.*;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class ProductMapper {
@@ -145,5 +144,38 @@ public class ProductMapper {
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
         product.setDescription(request.getDescription());
+    }
+
+    public ProductListResponse toListResponse(
+            Product product,
+            Integer quantity,
+            ProductImage image
+    ) {
+        ProductListResponse response =
+                new ProductListResponse();
+
+        response.setId(product.getId());
+        response.setName(product.getName());
+        response.setPrice(product.getPrice());
+        response.setQuantity(
+                quantity != null
+                        ? quantity
+                        : 0
+        );
+
+        Category category = product.getCategory();
+
+        if (category != null) {
+            response.setCategoryId(category.getId());
+            response.setCategoryName(category.getName());
+        }
+
+        response.setImages(
+                image == null
+                        ? List.of()
+                        : List.of(toImageResponse(image))
+        );
+
+        return response;
     }
 }

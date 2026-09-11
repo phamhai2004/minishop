@@ -11,21 +11,23 @@ import com.example.minishop.dto.request.ProductRequest;
 import com.example.minishop.dto.request.ProductSearchRequest;
 import com.example.minishop.entity.FlashSale;
 import com.example.minishop.entity.Shop;
+import com.example.minishop.dto.response.ProductListResponse;
 import com.example.minishop.dto.response.ProductResponse;
 import com.example.minishop.exception.BadRequestException;
 import com.example.minishop.exception.ResourceNotFoundException;
 import com.example.minishop.entity.Category;
 import com.example.minishop.entity.Product;
+import com.example.minishop.entity.ProductImage;
 import com.example.minishop.history.service.ProductViewHistoryService;
 import com.example.minishop.mapper.ProductMapper;
 import com.example.minishop.projection.ProductSummary;
 import com.example.minishop.qdrant.dto.SearchResult;
 import com.example.minishop.repository.FlashSaleRepository;
+import com.example.minishop.repository.ProductImageRepository;
 import com.example.minishop.repository.ProductRepository;
+import com.example.minishop.repository.ProductVariantRepository;
 import com.example.minishop.security.SecurityUtils;
 import com.example.minishop.specification.ProductSpecification;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -57,6 +59,8 @@ public class ProductService {
     private final QdrantService qdrantService;
     private final ProductViewHistoryService productViewHistoryService;
     private final FlashSaleRepository flashSaleRepository;
+    private final ProductVariantRepository productVariantRepository;
+    private final ProductImageRepository productImageRepository;
     public ProductService(
             ProductMapper productMapper,
             CategoryService categoryService,
@@ -66,7 +70,9 @@ public class ProductService {
             AIClient aiClient,
             QdrantService qdrantService,
             ProductViewHistoryService productViewHistoryService,
-            FlashSaleRepository flashSaleRepository
+            FlashSaleRepository flashSaleRepository,
+            ProductVariantRepository productVariantRepository,
+            ProductImageRepository productImageRepository
     ) {
         this.productMapper = productMapper;
         this.categoryService = categoryService;
@@ -77,6 +83,8 @@ public class ProductService {
         this.qdrantService = qdrantService;
         this.productViewHistoryService = productViewHistoryService;
         this.flashSaleRepository = flashSaleRepository;
+        this.productVariantRepository = productVariantRepository;
+        this.productImageRepository = productImageRepository;
     }
 
     private Product getEntityById(Long id) {
@@ -85,7 +93,7 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm với id: "+id));
     }
 
-        public ProductResponse toProductResponse(Product product) {
+    public ProductResponse toProductResponse(Product product) {
         Category category = product.getCategory();
 
         ProductResponse response = productMapper.toResponse(product, category);
@@ -107,13 +115,13 @@ public class ProductService {
             response.setShopId(product.getShop().getId());
             response.setShopName(product.getShop().getName());
         }
-            response.setStatus(product.getStatus());
+        response.setStatus(product.getStatus());
 
-            if (product.getStatus() != null) {
-                response.setStatusName(
-                        product.getStatus().getDisplayName()
-                );
-            }
+        if (product.getStatus() != null) {
+            response.setStatusName(
+                    product.getStatus().getDisplayName()
+            );
+        }
 
         return response;
     }
@@ -126,14 +134,12 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getProducts(
+    public Page<ProductListResponse> getProducts(
             int page,
             int size,
             String sort,
             String direction
     ) {
-        long totalStart = System.currentTimeMillis();
-
         String sortField = validateSortField(sort);
 
         Sort.Direction sortDirection =
@@ -141,61 +147,28 @@ public class ProductService {
                         ? Sort.Direction.DESC
                         : Sort.Direction.ASC;
 
-        if ("quantity".equals(sortField)) {
-
-            Pageable pageable = PageRequest.of(page, size);
-
-            Specification<Product> specification =
-                    Specification.allOf(
-                            ProductSpecification.hasStatus(ProductStatus.ACTIVE),
-                            ProductSpecification.shopHasStatus(ShopStatus.ACTIVE),
-                            ProductSpecification.orderByEffectiveQuantity(
-                                    sortDirection == Sort.Direction.DESC
-                            )
-                    );
-
-            long repositoryStart = System.currentTimeMillis();
-
-            Page<Product> productPage =
-                    productRepository.findAll(
-                            specification,
-                            pageable
-                    );
-
-            long repositoryEnd = System.currentTimeMillis();
-
-            long mappingStart = System.currentTimeMillis();
-
-            Page<ProductResponse> result =
-                    mapProductsWithFlashSales(productPage);
-
-            long mappingEnd = System.currentTimeMillis();
-
-            log.info(
-                    "PRODUCT_PERF sort=quantity repository={}ms mapping={}ms total={}ms size={}",
-                    repositoryEnd - repositoryStart,
-                    mappingEnd - mappingStart,
-                    mappingEnd - totalStart,
-                    productPage.getNumberOfElements()
-            );
-
-            return result;
-        }
-
-        Pageable pageable =
-                PageRequest.of(
-                        page,
-                        size,
-                        Sort.by(sortDirection, sortField)
-                );
-
+        Pageable pageable;
         Specification<Product> specification =
                 Specification.allOf(
                         ProductSpecification.hasStatus(ProductStatus.ACTIVE),
                         ProductSpecification.shopHasStatus(ShopStatus.ACTIVE)
                 );
 
-        long repositoryStart = System.currentTimeMillis();
+        if ("quantity".equals(sortField)) {
+            pageable = PageRequest.of(page, size);
+
+            specification = specification.and(
+                    ProductSpecification.orderByEffectiveQuantity(
+                            sortDirection == Sort.Direction.DESC
+                    )
+            );
+        } else {
+            pageable = PageRequest.of(
+                    page,
+                    size,
+                    Sort.by(sortDirection, sortField)
+            );
+        }
 
         Page<Product> productPage =
                 productRepository.findAll(
@@ -203,25 +176,7 @@ public class ProductService {
                         pageable
                 );
 
-        long repositoryEnd = System.currentTimeMillis();
-
-        long mappingStart = System.currentTimeMillis();
-
-        Page<ProductResponse> result =
-                mapProductsWithFlashSales(productPage);
-
-        long mappingEnd = System.currentTimeMillis();
-
-        log.info(
-                "PRODUCT_PERF sort={} repository={}ms mapping={}ms total={}ms size={}",
-                sortField,
-                repositoryEnd - repositoryStart,
-                mappingEnd - mappingStart,
-                mappingEnd - totalStart,
-                productPage.getNumberOfElements()
-        );
-
-        return result;
+        return mapProductsToListResponses(productPage);
     }
 
     @Transactional(readOnly = true)
@@ -487,7 +442,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponse> searchProducts(
+    public Page<ProductListResponse> searchProducts(
             ProductSearchRequest request,
             int page,
             int size,
@@ -532,12 +487,7 @@ public class ProductService {
         Pageable pageable;
 
         if ("quantity".equals(sortField)) {
-
-            pageable =
-                    PageRequest.of(
-                            page,
-                            size
-                    );
+            pageable = PageRequest.of(page, size);
 
             specification =
                     specification.and(
@@ -547,9 +497,7 @@ public class ProductService {
                                                     == Sort.Direction.DESC
                                     )
                     );
-
         } else {
-
             pageable =
                     PageRequest.of(
                             page,
@@ -560,13 +508,14 @@ public class ProductService {
                             )
                     );
         }
+
         Page<Product> productPage =
                 productRepository.findAll(
                         specification,
                         pageable
                 );
 
-        return mapProductsWithFlashSales(productPage);
+        return mapProductsToListResponses(productPage);
     }
 
     private void validateSearchRequest(
@@ -794,7 +743,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponse>
+    public Page<ProductListResponse>
     getPublicProductsByCategory(
             Long categoryId,
             int page,
@@ -821,7 +770,7 @@ public class ProductService {
                                 pageable
                         );
 
-        return mapProductsWithFlashSales(productPage);
+        return mapProductsToListResponses(productPage);
     }
 
     @Transactional(readOnly = true)
@@ -948,6 +897,158 @@ public class ProductService {
         );
     }
 
-    private static final Logger log =
-            LoggerFactory.getLogger(ProductService.class);
+    private Page<ProductListResponse> mapProductsToListResponses(
+            Page<Product> productPage
+    ) {
+        if (productPage.isEmpty()) {
+            return productPage.map(product -> null);
+        }
+
+        List<ProductListResponse> responses =
+                toProductListResponses(
+                        productPage.getContent()
+                );
+
+        Map<Long, ProductListResponse> responseMap =
+                responses.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        ProductListResponse::getId,
+                                        Function.identity()
+                                )
+                        );
+
+        return productPage.map(
+                product ->
+                        responseMap.get(product.getId())
+        );
+    }
+
+    private List<ProductListResponse> toProductListResponses(
+            List<Product> products
+    ) {
+        if (products == null || products.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> productIds =
+                products.stream()
+                        .map(Product::getId)
+                        .toList();
+
+        Map<Long, Integer> quantityMap =
+                productVariantRepository
+                        .sumQuantityByProductIds(productIds)
+                        .stream()
+                        .collect(
+                                Collectors.toMap(
+                                        row -> ((Number) row[0]).longValue(),
+                                        row -> ((Number) row[1]).intValue()
+                                )
+                        );
+
+        Map<Long, ProductImage> firstImageMap =
+                new java.util.LinkedHashMap<>();
+
+        productImageRepository
+                .findImagesByProductIds(productIds)
+                .forEach(row -> {
+                    Long productId =
+                            ((Number) row[0]).longValue();
+
+                    ProductImage image =
+                            (ProductImage) row[1];
+
+                    firstImageMap.putIfAbsent(
+                            productId,
+                            image
+                    );
+                });
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Map<Long, FlashSale> flashSaleMap =
+                flashSaleRepository
+                        .findActiveAvailableFlashSales(
+                                productIds,
+                                now
+                        )
+                        .stream()
+                        .collect(
+                                Collectors.toMap(
+                                        flashSale ->
+                                                flashSale
+                                                        .getProduct()
+                                                        .getId(),
+                                        Function.identity(),
+                                        (existing, replacement) ->
+                                                existing
+                                )
+                        );
+
+        return products.stream()
+                .map(product -> {
+                    Integer effectiveQuantity =
+                            quantityMap.get(product.getId());
+
+                    if (effectiveQuantity == null) {
+                        effectiveQuantity =
+                                product.getQuantity() != null
+                                        ? product.getQuantity()
+                                        : 0;
+                    }
+
+                    ProductListResponse response =
+                            productMapper.toListResponse(
+                                    product,
+                                    effectiveQuantity,
+                                    firstImageMap.get(product.getId())
+                            );
+
+                    FlashSale flashSale =
+                            flashSaleMap.get(product.getId());
+
+                    if (flashSale != null) {
+                        response.setFlashSale(true);
+                        response.setSalePrice(
+                                flashSale.getSalePrice()
+                        );
+                        response.setFlashSaleQuantity(
+                                flashSale.getQuantity()
+                        );
+                        response.setFlashSaleSold(
+                                flashSale.getSold()
+                        );
+                        response.setRemain(
+                                flashSale.getQuantity()
+                                        - flashSale.getSold()
+                        );
+                    } else {
+                        response.setFlashSale(false);
+                        response.setSalePrice(null);
+                    }
+
+                    if (product.getShop() != null) {
+                        response.setShopId(
+                                product.getShop().getId()
+                        );
+                        response.setShopName(
+                                product.getShop().getName()
+                        );
+                    }
+
+                    response.setStatus(product.getStatus());
+
+                    if (product.getStatus() != null) {
+                        response.setStatusName(
+                                product.getStatus()
+                                        .getDisplayName()
+                        );
+                    }
+
+                    return response;
+                })
+                .toList();
+    }
+
 }
