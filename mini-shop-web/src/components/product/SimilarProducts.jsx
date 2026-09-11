@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 
-import { Link } from "react-router-dom";
-
 import useSimilarProducts from "../../hooks/useSimilarProducts";
 
 import LoadingSpinner from "../common/LoadingSpinner";

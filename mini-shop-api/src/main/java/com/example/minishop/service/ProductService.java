@@ -24,6 +24,8 @@ import com.example.minishop.repository.FlashSaleRepository;
 import com.example.minishop.repository.ProductRepository;
 import com.example.minishop.security.SecurityUtils;
 import com.example.minishop.specification.ProductSpecification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -130,23 +132,29 @@ public class ProductService {
             String sort,
             String direction
     ) {
-        String sortField =
-                validateSortField(sort);
+        long totalStart = System.currentTimeMillis();
+
+        String sortField = validateSortField(sort);
 
         Sort.Direction sortDirection =
                 direction.equalsIgnoreCase("desc")
                         ? Sort.Direction.DESC
                         : Sort.Direction.ASC;
+
         if ("quantity".equals(sortField)) {
 
             Pageable pageable = PageRequest.of(page, size);
+
             Specification<Product> specification =
                     Specification.allOf(
                             ProductSpecification.hasStatus(ProductStatus.ACTIVE),
                             ProductSpecification.shopHasStatus(ShopStatus.ACTIVE),
-                            ProductSpecification
-                                    .orderByEffectiveQuantity(sortDirection == Sort.Direction.DESC)
+                            ProductSpecification.orderByEffectiveQuantity(
+                                    sortDirection == Sort.Direction.DESC
+                            )
                     );
+
+            long repositoryStart = System.currentTimeMillis();
 
             Page<Product> productPage =
                     productRepository.findAll(
@@ -154,21 +162,40 @@ public class ProductService {
                             pageable
                     );
 
-            return mapProductsWithFlashSales(productPage);
+            long repositoryEnd = System.currentTimeMillis();
+
+            long mappingStart = System.currentTimeMillis();
+
+            Page<ProductResponse> result =
+                    mapProductsWithFlashSales(productPage);
+
+            long mappingEnd = System.currentTimeMillis();
+
+            log.info(
+                    "PRODUCT_PERF sort=quantity repository={}ms mapping={}ms total={}ms size={}",
+                    repositoryEnd - repositoryStart,
+                    mappingEnd - mappingStart,
+                    mappingEnd - totalStart,
+                    productPage.getNumberOfElements()
+            );
+
+            return result;
         }
 
         Pageable pageable =
-                PageRequest.of(page, size, Sort.by(sortDirection, sortField)
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by(sortDirection, sortField)
                 );
 
         Specification<Product> specification =
                 Specification.allOf(
-                        ProductSpecification
-                                .hasStatus(ProductStatus.ACTIVE),
-
-                        ProductSpecification
-                                .shopHasStatus(ShopStatus.ACTIVE)
+                        ProductSpecification.hasStatus(ProductStatus.ACTIVE),
+                        ProductSpecification.shopHasStatus(ShopStatus.ACTIVE)
                 );
+
+        long repositoryStart = System.currentTimeMillis();
 
         Page<Product> productPage =
                 productRepository.findAll(
@@ -176,7 +203,25 @@ public class ProductService {
                         pageable
                 );
 
-        return mapProductsWithFlashSales(productPage);
+        long repositoryEnd = System.currentTimeMillis();
+
+        long mappingStart = System.currentTimeMillis();
+
+        Page<ProductResponse> result =
+                mapProductsWithFlashSales(productPage);
+
+        long mappingEnd = System.currentTimeMillis();
+
+        log.info(
+                "PRODUCT_PERF sort={} repository={}ms mapping={}ms total={}ms size={}",
+                sortField,
+                repositoryEnd - repositoryStart,
+                mappingEnd - mappingStart,
+                mappingEnd - totalStart,
+                productPage.getNumberOfElements()
+        );
+
+        return result;
     }
 
     @Transactional(readOnly = true)
@@ -902,4 +947,7 @@ public class ProductService {
                         responseMap.get(product.getId())
         );
     }
+
+    private static final Logger log =
+            LoggerFactory.getLogger(ProductService.class);
 }

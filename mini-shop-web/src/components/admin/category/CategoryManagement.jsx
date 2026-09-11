@@ -268,7 +268,7 @@ function CategoryManagement() {
           </div>
         )}
 
-        <p>Quản lý các danh mục sản phẩm của MiniShop.</p>
+        <p>Quản lý các danh mục sản phẩm của Hair.</p>
       </div>
 
       {error && <div className="category-management__error">{error}</div>}

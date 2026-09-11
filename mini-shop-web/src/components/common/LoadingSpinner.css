@@ -120,10 +120,6 @@
   color: #fff;
 }
 
-/* ==================================================
-   SHARED CENTERING
-   ================================================== */
-
 .loading-spinner:not(.loading-spinner--inline) {
   width: 100%;
 
