@@ -9,6 +9,7 @@ import com.example.minishop.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -27,15 +28,18 @@ public class OAuth2AuthenticationSuccessHandler
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
+    private final String frontendUrl;
 
     public OAuth2AuthenticationSuccessHandler(
             UserRepository userRepository,
             RefreshTokenRepository refreshTokenRepository,
-            JwtService jwtService
+            JwtService jwtService,
+            @Value("${app.frontend-url}") String frontendUrl
     ) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.jwtService = jwtService;
+        this.frontendUrl = frontendUrl;
     }
 
     @Override
@@ -168,7 +172,7 @@ public class OAuth2AuthenticationSuccessHandler
         String redirectUrl =
                 UriComponentsBuilder
                         .fromUriString(
-                                "http://localhost:5173/oauth2/callback"
+                                frontendUrl + "/oauth2/callback"
                         )
                         .queryParam(
                                 "accessToken",
