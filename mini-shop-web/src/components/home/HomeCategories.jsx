@@ -8,71 +8,70 @@ import LoadingSpinner from "../common/LoadingSpinner";
 
 import "./HomeCategories.css";
 
-
 const CATEGORY_ICONS = [
   {
     keywords: ["ốp lưng", "ốp điện thoại"],
-    icon: "material-symbols:phonelink-ring-rounded",
+    icon: "📱",
   },
   {
     keywords: ["điện thoại", "smartphone"],
-    icon: "material-symbols:smartphone-rounded",
+    icon: "📱",
   },
   {
     keywords: ["laptop", "máy tính"],
-    icon: "material-symbols:laptop-mac-rounded",
+    icon: "💻",
   },
   {
     keywords: ["máy ảnh", "camera"],
-    icon: "material-symbols:photo-camera-rounded",
+    icon: "📷",
   },
   {
     keywords: ["giày", "dép"],
-    icon: "material-symbols:steps-rounded",
+    icon: "👟",
   },
   {
     keywords: ["quần áo", "thời trang"],
-    icon: "material-symbols:checkroom-rounded",
+    icon: "👕",
   },
   {
     keywords: ["đồng hồ"],
-    icon: "material-symbols:watch-rounded",
+    icon: "⌚",
   },
   {
     keywords: ["túi", "ví"],
-    icon: "material-symbols:shopping-bag-rounded",
+    icon: "👜",
   },
   {
     keywords: ["sức khỏe", "y tế"],
-    icon: "material-symbols:health-and-safety-rounded",
+    icon: "💊",
   },
   {
     keywords: ["sách"],
-    icon: "material-symbols:menu-book-rounded",
+    icon: "📚",
   },
   {
     keywords: ["mẹ", "bé"],
-    icon: "material-symbols:child-care-rounded",
+    icon: "👶",
   },
   {
     keywords: ["nhà cửa", "đời sống", "gia dụng"],
-    icon: "material-symbols:home-rounded",
+    icon: "🏠",
   },
   {
     keywords: ["thể thao", "du lịch"],
-    icon: "material-symbols:sports-soccer-rounded",
+    icon: "⚽",
   },
   {
     keywords: ["ô tô", "xe máy", "xe đạp"],
-    icon: "material-symbols:two-wheeler-rounded",
+    icon: "🛵",
   },
   {
     keywords: ["sắc đẹp", "mỹ phẩm", "làm đẹp"],
-    icon: "material-symbols:face-retouching-natural-rounded",
+    icon: "💄",
   },
   {
     keywords: ["trang sức", "phụ kiện"],
-    icon: "material-symbols:diamond-rounded",
+    icon: "💍",
   },
 ];
 
@@ -160,11 +159,7 @@ function HomeCategories() {
               onClick={() => handleCategoryClick(category.id)}
             >
               <span className="home-category__icon" aria-hidden="true">
-                <iconify-icon
-                  icon={getCategoryIcon(category.name)}
-                  width="34"
-                  height="34"
-                />
+                {getCategoryIcon(category.name)}
               </span>
 
               <span className="home-category__name">{category.name}</span>

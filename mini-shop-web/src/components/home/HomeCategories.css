@@ -218,16 +218,13 @@
   flex: 0 0 68px;
 
   border: 1px solid rgb(196 181 253 / 55%);
-  border-radius: 20px;
+  border-radius: 50%;
 
   background:
     radial-gradient(circle at 78% 20%, rgb(251 146 60 / 20%), transparent 35%),
-    linear-gradient(135deg, #ede9fe, #f5f3ff);
+    linear-gradient(135deg, #ffffff, #f5f3ff);
 
   color: #7e22ce;
-
-  font-size: 1.55rem;
-  font-weight: 800;
 
   box-shadow:
     0 8px 18px rgb(109 40 217 / 9%),
@@ -237,6 +234,24 @@
     transform 0.2s ease,
     background 0.2s ease,
     color 0.2s ease;
+}
+
+.home-category__icon iconify-icon {
+  display: block;
+
+  color: currentColor;
+
+  filter: drop-shadow(0 4px 8px rgb(109 40 217 / 12%));
+
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.home-category:hover .home-category__icon iconify-icon {
+  transform: scale(1.08);
+
+  filter: drop-shadow(0 6px 10px rgb(109 40 217 / 18%));
 }
 
 .home-category:hover .home-category__icon {
@@ -372,7 +387,8 @@
 
     flex-basis: 54px;
 
-    font-size: 1.2rem;
+    font-size: 1.6rem;
+    line-height: 1;
   }
 
   .home-category__name {
