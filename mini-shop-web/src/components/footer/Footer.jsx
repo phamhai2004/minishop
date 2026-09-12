@@ -52,10 +52,12 @@ function Footer() {
               <iconify-icon icon="lucide:facebook" />
               Facebook
             </a>
+
             <a href="https://www.instagram.com/pvh.04/" aria-label="Instagram">
               <iconify-icon icon="lucide:instagram" />
               Instagram
             </a>
+
             <a href="https://github.com/phamhai2004" aria-label="GitHub">
               <iconify-icon icon="lucide:github" />
               GitHub
