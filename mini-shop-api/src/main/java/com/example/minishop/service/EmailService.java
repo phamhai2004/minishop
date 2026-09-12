@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private final BrevoEmailClient brevoEmailClient;
     private final TemplateEngine templateEngine;
     private final ProductImageRepository productImageRepository;
 
@@ -36,11 +36,11 @@ public class EmailService {
     private String frontendUrl;
 
     public EmailService(
-            JavaMailSender mailSender,
+            BrevoEmailClient brevoEmailClient,
             TemplateEngine templateEngine,
             ProductImageRepository productImageRepository
     ) {
-        this.mailSender = mailSender;
+        this.brevoEmailClient = brevoEmailClient;
         this.templateEngine = templateEngine;
         this.productImageRepository = productImageRepository;
     }
@@ -70,24 +70,11 @@ public class EmailService {
                 context
         );
 
-        MimeMessage message = mailSender.createMimeMessage();
-
-        MimeMessageHelper helper = new MimeMessageHelper(
-                message,
-                true,
-                "UTF-8"
+        brevoEmailClient.sendHtmlEmail(
+                order.getUser().getEmail(),
+                "Hair - Đơn hàng #" + order.getId() + " đã bị hủy",
+                htmlContent
         );
-
-        helper.setFrom(
-                senderName + " <" + senderEmail + ">"
-        );
-        helper.setTo(order.getUser().getEmail());
-        helper.setSubject(
-                "Hair- Đơn hàng #" + order.getId() + " đã bị hủy"
-        );
-        helper.setText(htmlContent, true);
-
-        mailSender.send(message);
     }
 
     public void sendRegistrationVerificationEmail(
@@ -113,29 +100,11 @@ public class EmailService {
                 context
         );
 
-        MimeMessage message = mailSender.createMimeMessage();
-
-        MimeMessageHelper helper = new MimeMessageHelper(
-                message,
-                true,
-                "UTF-8"
+        brevoEmailClient.sendHtmlEmail(
+                verification.getEmail(),
+                "Hair - Xác minh email đăng ký tài khoản",
+                htmlContent
         );
-
-        helper.setFrom(
-                senderName + " <" + senderEmail + ">"
-        );
-
-        helper.setTo(
-                verification.getEmail()
-        );
-
-        helper.setSubject(
-                "Hair- Xác minh email đăng ký tài khoản"
-        );
-
-        helper.setText(htmlContent, true);
-
-        mailSender.send(message);
     }
 
     public void sendEmailChangeVerificationEmail(
@@ -161,29 +130,11 @@ public class EmailService {
                 context
         );
 
-        MimeMessage message = mailSender.createMimeMessage();
-
-        MimeMessageHelper helper = new MimeMessageHelper(
-                message,
-                true,
-                "UTF-8"
+        brevoEmailClient.sendHtmlEmail(
+                verification.getEmail(),
+                "Hair - Xác minh email tài khoản",
+                htmlContent
         );
-
-        helper.setFrom(
-                senderName + " <" + senderEmail + ">"
-        );
-
-        helper.setTo(
-                verification.getEmail()
-        );
-
-        helper.setSubject(
-                "Hair - Xác minh email tài khoản"
-        );
-
-        helper.setText(htmlContent, true);
-
-        mailSender.send(message);
     }
 
     public void sendShopOrderCreatedEmail(
@@ -313,37 +264,14 @@ public class EmailService {
                         context
                 );
 
-        MimeMessage message =
-                mailSender.createMimeMessage();
-
-        MimeMessageHelper helper =
-                new MimeMessageHelper(
-                        message,
-                        true,
-                        "UTF-8"
-                );
-
-        helper.setFrom(
-                senderName + " <" + senderEmail + ">"
-        );
-
-        helper.setTo(
-                order.getUser().getEmail()
-        );
-
-        helper.setSubject(
+        brevoEmailClient.sendHtmlEmail(
+                order.getUser().getEmail(),
                 "Hair - Đặt hàng thành công tại "
                         + shopOrder.getShop().getName()
                         + " - Đơn #"
-                        + shopOrder.getOrderCode()
+                        + shopOrder.getOrderCode(),
+                htmlContent
         );
-
-        helper.setText(
-                htmlContent,
-                true
-        );
-
-        mailSender.send(message);
     }
 
     public void sendShopOrderDeliveredEmail(
@@ -479,38 +407,15 @@ public class EmailService {
                         context
                 );
 
-        MimeMessage message =
-                mailSender.createMimeMessage();
-
-        MimeMessageHelper helper =
-                new MimeMessageHelper(
-                        message,
-                        true,
-                        "UTF-8"
-                );
-
-        helper.setFrom(
-                senderName + " <" + senderEmail + ">"
-        );
-
-        helper.setTo(
-                order.getUser().getEmail()
-        );
-
-        helper.setSubject(
+        brevoEmailClient.sendHtmlEmail(
+                order.getUser().getEmail(),
                 "Hair - Đơn hàng #"
                         + shopOrder.getOrderCode()
                         + " từ "
                         + shopOrder.getShop().getName()
-                        + " đã giao thành công"
+                        + " đã giao thành công",
+                htmlContent
         );
-
-        helper.setText(
-                htmlContent,
-                true
-        );
-
-        mailSender.send(message);
     }
 
     private String buildShippingAddress(Address address) {
