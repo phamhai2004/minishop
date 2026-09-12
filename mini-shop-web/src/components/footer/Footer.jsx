@@ -45,15 +45,18 @@ function Footer() {
 
           <div className="site-footer__column">
             <h3>THEO DÕI CHÚNG TÔI</h3>
-            <a href="#" aria-label="Facebook">
+            <a
+              href="https://www.facebook.com/pham.van.hai.08062004?locale=vi_VN"
+              aria-label="Facebook"
+            >
               <iconify-icon icon="lucide:facebook" />
               Facebook
             </a>
-            <a href="#" aria-label="Instagram">
+            <a href="https://www.instagram.com/pvh.04/" aria-label="Instagram">
               <iconify-icon icon="lucide:instagram" />
               Instagram
             </a>
-            <a href="#" aria-label="GitHub">
+            <a href="https://github.com/phamhai2004" aria-label="GitHub">
               <iconify-icon icon="lucide:github" />
               GitHub
             </a>
