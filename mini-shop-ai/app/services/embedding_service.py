@@ -42,6 +42,6 @@ class EmbeddingService:
         with torch.no_grad():
             embedding = self.model.encode_image(image_tensor)
 
-            embedding /= embedding.norm(dim=-1, keepdim=True)
+            embedding /= embedding.norm(dim=-1, keepdim=Tzrue)
 
         return embedding.squeeze().cpu().tolist()

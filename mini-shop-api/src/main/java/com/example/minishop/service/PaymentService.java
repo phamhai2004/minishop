@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -30,6 +31,8 @@ public class PaymentService {
 
     private static final DateTimeFormatter VNPAY_DATE_FORMAT =
             DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
+    private static final ZoneId VIETNAM_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
     private static final EnumSet<PaymentTransactionStatus>
             ACTIVE_PAYMENT_STATUSES =
@@ -83,7 +86,7 @@ public class PaymentService {
 
         Payment payment = new Payment();
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(VIETNAM_ZONE);
         LocalDateTime expiredAt = now.plusMinutes(
                 vnPayProperties.getExpireMinutes()
         );
@@ -484,7 +487,7 @@ public class PaymentService {
             }
 
             LocalDateTime paidAt =
-                    LocalDateTime.now();
+                    LocalDateTime.now(VIETNAM_ZONE);
 
             payment.setStatus(
                     PaymentTransactionStatus.SUCCESS
