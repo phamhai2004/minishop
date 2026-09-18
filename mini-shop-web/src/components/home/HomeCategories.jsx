@@ -73,6 +73,22 @@ const CATEGORY_ICONS = [
     keywords: ["trang sức", "phụ kiện"],
     icon: "💍",
   },
+  {
+    keywords: ["bàn phím", "keyboard"],
+    icon: "⌨️",
+  },
+  {
+    keywords: ["chuột", "mouse"],
+    icon: "🖱️",
+  },
+  {
+    keywords: ["balo", "ba lô", "backpack"],
+    icon: "🎒",
+  },
+  {
+    keywords: ["đồ chơi", "toy"],
+    icon: "🧸",
+  },
 ];
 
 function getCategoryIcon(categoryName) {
@@ -84,7 +100,7 @@ function getCategoryIcon(categoryName) {
     keywords.some((keyword) => normalizedName.includes(keyword)),
   );
 
-  return matchedCategory?.icon ?? "material-symbols:category-rounded";
+  return matchedCategory?.icon ?? "📦";
 }
 
 function HomeCategories() {

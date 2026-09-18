@@ -1,6 +1,6 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 import Footer from "../components/footer/Footer";
 import Header from "../components/header/Header";
@@ -9,13 +9,23 @@ import ChatHub from "../components/chat/ChatHub";
 import MobileTopBar from "../components/mobile/MobileTopBar";
 import MobileBottomNav from "../components/mobile/MobileBottomNav";
 
+import SellerApprovedModal from "../components/common/SellerApprovedModal";
+
 import { useAuth } from "../contexts/AuthContext";
 import ROLES from "../components/constants/roles";
+
+import shopApi from "../api/shopApi";
 
 import "./AppLayout.css";
 
 function AppLayout() {
-  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  const { currentUser, logout } = useAuth();
+
+  const [sellerApproved, setSellerApproved] = useState(false);
+
+  const [confirming, setConfirming] = useState(false);
 
   const canUseShopChat =
     currentUser?.role === ROLES.CUSTOMER || currentUser?.role === ROLES.SELLER;
@@ -51,6 +61,72 @@ function AppLayout() {
       window.removeEventListener("resize", updateTopbarHeight);
     };
   }, []);
+
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== ROLES.CUSTOMER) {
+      setSellerApproved(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const checkShopApproval = async () => {
+      try {
+        const response = await shopApi.getMyShop();
+
+        const shop = response.data?.data;
+
+        if (
+          !cancelled &&
+          shop?.status === "ACTIVE" &&
+          shop?.verified === true
+        ) {
+          setSellerApproved(true);
+        }
+      } catch (error) {
+        if (error.response?.status !== 404) {
+          console.error("Không thể kiểm tra trạng thái shop:", error);
+        }
+      }
+    };
+
+    void checkShopApproval();
+
+    const intervalId = window.setInterval(checkShopApproval, 15000);
+
+    const handleWindowFocus = () => {
+      void checkShopApproval();
+    };
+
+    window.addEventListener("focus", handleWindowFocus);
+
+    return () => {
+      cancelled = true;
+
+      window.clearInterval(intervalId);
+
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, [currentUser]);
+
+  const handleSellerApprovedConfirm = async () => {
+    try {
+      setConfirming(true);
+
+      await logout();
+
+      navigate("/login", {
+        replace: true,
+        state: {
+          message:
+            "Tài khoản đã được nâng cấp lên Người bán. Vui lòng đăng nhập lại.",
+        },
+      });
+    } finally {
+      setConfirming(false);
+    }
+  };
+
   return (
     <div ref={layoutRef} className="app-layout">
       <div ref={topbarRef} className="app-layout__topbar">
@@ -75,6 +151,12 @@ function AppLayout() {
       </div>
 
       <MobileBottomNav />
+
+      <SellerApprovedModal
+        open={sellerApproved}
+        confirming={confirming}
+        onConfirm={handleSellerApprovedConfirm}
+      />
     </div>
   );
 }

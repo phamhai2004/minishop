@@ -152,11 +152,10 @@ public class ShopService {
 
         shop.setStatus(ShopStatus.ACTIVE);
         shop.setApprovedAt(LocalDateTime.now());
+        shop.setVerified(true);
 
         User owner = shop.getOwner();
         owner.setRole(Role.SELLER);
-
-        shop.setVerified(false);
 
         return shopMapper.toResponse(shop);
     }

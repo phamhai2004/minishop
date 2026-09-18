@@ -29,6 +29,8 @@ export default function ProductInfo({ product }) {
 
   const isGuest = !isAuthenticated;
   const isCustomer = userRole === ROLES.CUSTOMER;
+  const isAdmin = userRole === ROLES.ADMIN;
+  const canShowPurchaseActions = !isAdmin;
 
   const variants = Array.isArray(product.variants) ? product.variants : [];
 
@@ -331,49 +333,53 @@ export default function ProductInfo({ product }) {
           </div>
         )}
 
-        <div className="purchase-quantity">
-          <span className="purchase-quantity__label">Số lượng</span>
+        {canShowPurchaseActions && (
+          <>
+            <div className="purchase-quantity">
+              <span className="purchase-quantity__label">Số lượng</span>
 
-          <div className="purchase-quantity__controls">
-            <button
-              type="button"
-              onClick={decreaseQuantity}
-              disabled={purchaseQuantity <= 1}
-            >
-              −
-            </button>
+              <div className="purchase-quantity__controls">
+                <button
+                  type="button"
+                  onClick={decreaseQuantity}
+                  disabled={purchaseQuantity <= 1}
+                >
+                  −
+                </button>
 
-            <span>{purchaseQuantity}</span>
+                <span>{purchaseQuantity}</span>
 
-            <button
-              type="button"
-              onClick={increaseQuantity}
-              disabled={purchaseQuantity >= currentQuantity}
-            >
-              +
-            </button>
-          </div>
-        </div>
+                <button
+                  type="button"
+                  onClick={increaseQuantity}
+                  disabled={purchaseQuantity >= currentQuantity}
+                >
+                  +
+                </button>
+              </div>
+            </div>
 
-        <div className="product-info__actions">
-          <button
-            type="button"
-            className="product-info__buy-button"
-            onClick={handleBuyNow}
-            disabled={!hasSelectedVariant || isOutOfStock}
-          >
-            Mua ngay
-          </button>
+            <div className="product-info__actions">
+              <button
+                type="button"
+                className="product-info__buy-button"
+                onClick={handleBuyNow}
+                disabled={!hasSelectedVariant || isOutOfStock}
+              >
+                Mua ngay
+              </button>
 
-          <button
-            type="button"
-            className="product-info__cart-button"
-            onClick={handleAddToCart}
-            disabled={!hasSelectedVariant || isOutOfStock}
-          >
-            Thêm vào giỏ hàng
-          </button>
-        </div>
+              <button
+                type="button"
+                className="product-info__cart-button"
+                onClick={handleAddToCart}
+                disabled={!hasSelectedVariant || isOutOfStock}
+              >
+                Thêm vào giỏ hàng
+              </button>
+            </div>
+          </>
+        )}
 
         {product.description && (
           <section className="product-info__description">

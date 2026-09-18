@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 
 import { Link, useParams } from "react-router-dom";
 
+import { useAuth } from "../../contexts/AuthContext";
+import ROLES from "../../components/constants/roles";
+
 import productApi from "../../api/productApi";
 import shopApi from "../../api/shopApi";
 
@@ -17,6 +20,10 @@ import "./ProductDetailPage.css";
 
 function ProductDetailPage() {
   const { id } = useParams();
+
+  const { currentUser } = useAuth();
+
+  const isAdmin = currentUser?.role === ROLES.ADMIN;
 
   const [product, setProduct] = useState(null);
 
@@ -140,7 +147,7 @@ function ProductDetailPage() {
         <div className="product-detail__media">
           <ProductGallery images={product.images} productName={product.name} />
 
-          <WishlistButton productId={product.id} />
+          {!isAdmin && <WishlistButton productId={product.id} />}
         </div>
 
         <ProductInfo product={product} />
